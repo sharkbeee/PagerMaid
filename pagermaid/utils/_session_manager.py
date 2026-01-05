@@ -139,9 +139,9 @@ class SessionConvert:
         )
         conn.execute(
             """CREATE TABLE IF NOT EXISTS sessions (
-                    dc_id INTEGER PRIMARY KEY, 
-                    server_address TEXT, 
-                    port INTEGER, 
+                    dc_id INTEGER PRIMARY KEY,
+                    server_address TEXT,
+                    port INTEGER,
                     auth_key BLOB,
                     takeout_id INTEGER
                 );

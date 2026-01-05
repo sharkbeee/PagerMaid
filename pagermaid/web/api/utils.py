@@ -18,10 +18,10 @@ def authentication():
                 return
             try:
                 jwt.decode(_token, Config.WEB_SECRET_KEY, algorithms=ALGORITHM)
-            except (jwt.PyJWTError, jwt.ExpiredSignatureError, AttributeError):
+            except (jwt.PyJWTError, jwt.ExpiredSignatureError, AttributeError) as err:
                 raise HTTPException(
                     status_code=400, detail="登录验证失败或已失效，请重新登录"
-                )
+                ) from err
 
     return Depends(inner)
 

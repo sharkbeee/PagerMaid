@@ -37,9 +37,9 @@ def un_tar_gz(filename, dirs):
     :return: bool
     """
     try:
-        t = tarfile.open(filename, "r:gz")
-        t.extractall(path=dirs)
-        return True
+        with tarfile.open(filename, "r:gz") as t:
+            t.extractall(path=dirs)
+            return True
     except Exception as e:
         print(e, format_exc())
         return False

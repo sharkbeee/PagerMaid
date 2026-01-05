@@ -1,5 +1,7 @@
 """PagerMaid module for different ways to avoid users."""
 
+import contextlib
+
 from pagermaid.dependence import sqlite
 from pagermaid.enums import Client, Message
 from pagermaid.enums.command import CommandHandler
@@ -134,10 +136,8 @@ async def deny_status(message: Message):
 async def set_read_acknowledgement(context: Message):
     """Event handler to infinitely read ghosted messages."""
     if sqlite.get(f"ghosted.chat_id.{str(context.chat_id)}", None):
-        try:
+        with contextlib.suppress(ValueError):
             await context.client.send_read_acknowledge(context.chat_id)
-        except ValueError:
-            pass
 
 
 @listener(is_plugin=False, incoming=True, ignore_edited=True)

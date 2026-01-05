@@ -24,7 +24,7 @@ class TelegramClient(telethon.TelegramClient):
 
 
 @patch(telethon.tl.patched.Message)
-class Message(telethon.tl.patched.Message):
+class Message(telethon.tl.patched.Message):  # noqa: F811
     @patchable
     async def safe_delete(self, *args, **kwargs):
         try:
