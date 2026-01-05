@@ -5,9 +5,10 @@ from typing import TYPE_CHECKING
 
 from pagermaid.dependence import get_sudo_list
 from pagermaid.services import bot
+
+from ..config import Config
 from . import logs
 from ._path import safe_remove
-from ..config import Config
 
 if TYPE_CHECKING:
     from pagermaid.enums import Message

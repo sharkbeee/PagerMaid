@@ -2,9 +2,10 @@ import contextlib
 import io
 import sys
 import traceback
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
-from pagermaid.services import client as httpx_client, bot, sqlite
+from pagermaid.services import bot, sqlite
+from pagermaid.services import client as httpx_client
 from pagermaid.utils import lang
 from pagermaid.utils.listener import from_self
 
@@ -79,7 +80,7 @@ async def process_exit(start: int, _client, message=None):
     cid, mid = data.get("cid", 0), data.get("mid", 0)
     if start and data and cid and mid:
         with contextlib.suppress(Exception):
-            msg: "Message" = await _client.get_messages(cid, ids=mid)
+            msg: Message = await _client.get_messages(cid, ids=mid)
             await msg.edit(
                 (msg.text if from_self(msg) and msg.text else "")
                 + f"\n\n> {lang('restart_complete')}"

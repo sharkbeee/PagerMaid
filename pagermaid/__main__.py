@@ -1,8 +1,9 @@
 import asyncio
 from os import sep
 from pathlib import Path
-from signal import signal as signal_fn, SIGINT, SIGTERM, SIGABRT
-from sys import path, platform, exit
+from signal import SIGABRT, SIGINT, SIGTERM
+from signal import signal as signal_fn
+from sys import exit, path, platform
 
 from telethon.errors.rpcerrorlist import AuthKeyError
 
@@ -11,7 +12,7 @@ from pagermaid.config import Config
 from pagermaid.dependence import scheduler
 from pagermaid.services import bot
 from pagermaid.static import working_dir
-from pagermaid.utils import lang, logs, SessionFileManager
+from pagermaid.utils import SessionFileManager, lang, logs
 from pagermaid.web import web
 from pagermaid.web.api.web_login import web_login
 from pyromod.methods.sign_in_qrcode import start_client

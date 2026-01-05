@@ -8,7 +8,7 @@ from platform import node
 from time import perf_counter
 from typing import TYPE_CHECKING
 
-from pagermaid.common.system import run_eval, paste_pb, process_exit
+from pagermaid.common.system import paste_pb, process_exit, run_eval
 from pagermaid.config import Config
 from pagermaid.hook import Hook
 from pagermaid.listener import listener

@@ -1,6 +1,6 @@
 """Message related utilities."""
 
-from telethon.errors import ForbiddenError, AuthKeyError
+from telethon.errors import AuthKeyError, ForbiddenError
 from telethon.errors.rpcerrorlist import FloodWaitError, MessageIdInvalidError
 from telethon.tl.types import ChannelForbidden
 

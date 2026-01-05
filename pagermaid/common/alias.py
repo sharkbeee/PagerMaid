@@ -1,6 +1,6 @@
-from os import sep
 from json import dump as json_dump
-from typing import List, Dict
+from os import sep
+from typing import Dict, List
 
 from pydantic import BaseModel
 

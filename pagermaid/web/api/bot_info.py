@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
-from pagermaid.web.api.utils import authentication
 from pagermaid.common.update import update
+from pagermaid.web.api.utils import authentication
 
 route = APIRouter()
 

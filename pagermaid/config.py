@@ -5,7 +5,7 @@ from pathlib import Path
 from shutil import copyfile
 from typing import Dict
 
-from yaml import load, FullLoader, safe_load
+from yaml import FullLoader, load, safe_load
 
 DATA_PATH = Path("data")
 DATA_PATH.mkdir(exist_ok=True)
@@ -107,13 +107,11 @@ class Config:
         try:
             with open(
                 f"languages{os.sep}built-in{os.sep}en.yml",
-                "r",
                 encoding="utf-8",
             ) as f:
                 lang_default_dict = safe_load(f)
             with open(
                 f"languages{os.sep}built-in{os.sep}{LANGUAGE}.yml",
-                "r",
                 encoding="utf-8",
             ) as f:
                 lang_dict = safe_load(f)
@@ -125,7 +123,6 @@ class Config:
             try:
                 with open(
                     f"languages{os.sep}built-in{os.sep}en.yml",
-                    "r",
                     encoding="utf-8",
                 ) as f:
                     lang_dict = safe_load(f)
@@ -136,7 +133,7 @@ class Config:
         try:
             with open(f"data{os.sep}alias.json", encoding="utf-8") as f:
                 alias_dict = load_json(f)
-        except Exception as e:
+        except Exception:
             alias_dict = {}
         web_interface = config.get("web_interface", {})
         WEB_ENABLE = strtobool(

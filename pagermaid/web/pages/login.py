@@ -1,12 +1,12 @@
 from amis import (
-    Form,
-    InputPassword,
-    DisplayModeEnum,
-    Horizontal,
-    Remark,
-    Html,
-    Page,
     AmisAPI,
+    DisplayModeEnum,
+    Form,
+    Horizontal,
+    Html,
+    InputPassword,
+    Page,
+    Remark,
     Wrapper,
 )
 

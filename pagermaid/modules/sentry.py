@@ -1,10 +1,10 @@
 import sys
-from subprocess import run, PIPE
+from subprocess import PIPE, run
 from time import time
 
 import sentry_sdk
-from telethon.errors import UnauthorizedError, UsernameInvalidError
 from sentry_sdk.integrations.httpx import HttpxIntegration
+from telethon.errors import UnauthorizedError, UsernameInvalidError
 
 from pagermaid.config import Config
 from pagermaid.enums import Client, Message

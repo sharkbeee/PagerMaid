@@ -1,5 +1,4 @@
 from datetime import timedelta
-
 from typing import TYPE_CHECKING
 
 from pagermaid.common.cache import cache

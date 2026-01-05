@@ -8,9 +8,9 @@ from asyncio import sleep
 from typing import Union
 
 from telethon.tl.functions.messages import (
+    ClickSponsoredMessageRequest,
     GetSponsoredMessagesRequest,
     ViewSponsoredMessageRequest,
-    ClickSponsoredMessageRequest,
 )
 from telethon.tl.types import InputPeerChannel
 from telethon.tl.types.messages import SponsoredMessages, SponsoredMessagesEmpty
@@ -18,7 +18,9 @@ from telethon.tl.types.messages import SponsoredMessages, SponsoredMessagesEmpty
 from pagermaid.config import Config
 from pagermaid.enums import Client, Message
 from pagermaid.hook import Hook
-from pagermaid.services import client as request, scheduler, bot as userbot
+from pagermaid.services import bot as userbot
+from pagermaid.services import client as request
+from pagermaid.services import scheduler
 from pagermaid.utils import logs
 
 

@@ -10,7 +10,7 @@ from pagermaid.group_manager import enforce_permission
 from pagermaid.listener import listener
 from pagermaid.static import help_messages
 from pagermaid.utils import lang
-from pagermaid.utils.listener import from_self, from_msg_get_sudo_uid
+from pagermaid.utils.listener import from_msg_get_sudo_uid, from_self
 
 
 @listener(

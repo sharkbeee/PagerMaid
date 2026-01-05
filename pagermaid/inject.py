@@ -1,7 +1,8 @@
 import inspect
+from typing import Dict, Optional
+
 import pagermaid.enums as enums
 import pagermaid.services as services
-from typing import Dict, Optional
 
 
 def inject(message: enums.Message, function, **data) -> Optional[Dict]:

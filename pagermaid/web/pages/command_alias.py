@@ -1,4 +1,4 @@
-from amis import Form, InputSubForm, InputText, Static, Alert, PageSchema, Page
+from amis import Alert, Form, InputSubForm, InputText, Page, PageSchema, Static
 
 main_form = Form(
     title="命令别名",

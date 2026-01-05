@@ -1,12 +1,12 @@
-from typing import List, Optional, TYPE_CHECKING
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from typing import TYPE_CHECKING, List, Optional
 
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from telethon import TelegramClient as OldClient
 from telethon.tl.patched import Message as OldMessage
 
 if TYPE_CHECKING:
-    from telethon.types import User
     from telethon.tl.custom import Dialog
+    from telethon.types import User
 
 
 class Message(OldMessage):

@@ -1,6 +1,4 @@
 import python_socks
-import pyromod.listen
-
 from telethon import TelegramClient
 from telethon.sessions import StringSession
 

@@ -1,9 +1,10 @@
 import contextlib
 import datetime
+from typing import TYPE_CHECKING
 
 import pytz
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from typing import TYPE_CHECKING
+
 from pagermaid.config import Config
 
 if TYPE_CHECKING:

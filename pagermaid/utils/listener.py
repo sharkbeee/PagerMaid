@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 from telethon.errors import RPCError
 
-from pagermaid.dependence import status_sudo, get_sudo_list
+from pagermaid.dependence import get_sudo_list, status_sudo
 from pagermaid.group_manager import enforce_permission
 
 if TYPE_CHECKING:
