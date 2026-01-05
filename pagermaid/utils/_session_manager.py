@@ -1,12 +1,13 @@
 import ipaddress
 import sqlite3
-
-from pydantic import BaseModel, Field
 from pathlib import Path
 
+from pydantic import BaseModel, Field
+
 from pagermaid.config import DATA_PATH
-from ._path import safe_remove
+
 from ..version import pgm_telethon
+from ._path import safe_remove
 
 
 class TDSession(BaseModel):

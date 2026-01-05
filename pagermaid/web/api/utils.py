@@ -1,8 +1,8 @@
 import datetime
-import jwt
 from typing import Optional
 
-from fastapi import Header, HTTPException, Depends, Cookie
+import jwt
+from fastapi import Cookie, Depends, Header, HTTPException
 
 from pagermaid.config import Config
 

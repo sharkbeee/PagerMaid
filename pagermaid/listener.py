@@ -4,18 +4,18 @@ import asyncio
 import contextlib
 import sys
 from asyncio import CancelledError
-from time import strftime, gmtime, time
+from time import gmtime, strftime, time
 from traceback import format_exc
 
 from telethon import events
 from telethon.errors import (
-    MessageTooLongError,
-    MessageNotModifiedError,
-    MessageEmptyError,
-    UserNotParticipantError,
     ForbiddenError,
-    PeerIdInvalidError,
+    MessageEmptyError,
     MessageIdInvalidError,
+    MessageNotModifiedError,
+    MessageTooLongError,
+    PeerIdInvalidError,
+    UserNotParticipantError,
 )
 from telethon.events import StopPropagation
 
@@ -26,16 +26,18 @@ from pagermaid.enums.command import CommandHandler, CommandHandlerDecorator
 from pagermaid.group_manager import Permission
 from pagermaid.hook import HookRunner
 from pagermaid.services import bot
-from pagermaid.static import help_messages, read_context, all_permissions
+from pagermaid.static import all_permissions, help_messages, read_context
 from pagermaid.utils import (
-    lang,
     alias_command,
+    lang,
     logs,
 )
 from pagermaid.utils.bot_utils import attach_report
 from pagermaid.utils.listener import (
-    get_permission_name,
     format_exc as format_exc_text,
+)
+from pagermaid.utils.listener import (
+    get_permission_name,
 )
 from pagermaid.web import web
 from pyromod.utils.handler_priority import HandlerList
@@ -50,8 +52,8 @@ def listener(**args) -> CommandHandlerDecorator:
     allow_parent = args.get("allow_parent", False)
     disallow_alias = args.get("disallow_alias", False)
     need_admin = args.get("need_admin", False)
-    description = args.get("description", None)
-    parameters = args.get("parameters", None)
+    description = args.get("description")
+    parameters = args.get("parameters")
     pattern = sudo_pattern = args.get("pattern")
     diagnostics = args.get("diagnostics", True)
     incoming = args.get("incoming", False)

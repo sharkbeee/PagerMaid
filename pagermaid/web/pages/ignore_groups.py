@@ -1,10 +1,10 @@
 from amis import (
-    InputText,
-    Switch,
     Card,
     CardsCRUD,
-    PageSchema,
+    InputText,
     Page,
+    PageSchema,
+    Switch,
 )
 
 card = Card(

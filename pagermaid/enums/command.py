@@ -1,4 +1,4 @@
-from typing import NewType, Callable, Any, Awaitable, Union, TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Any, Awaitable, Callable, NewType, Optional, Union
 
 from ..inject import inject
 

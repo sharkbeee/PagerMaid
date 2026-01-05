@@ -1,6 +1,6 @@
+import shutil
 from datetime import datetime
 from pathlib import Path
-import shutil
 
 data = Path("data")
 data.mkdir(exist_ok=True)

@@ -3,25 +3,23 @@
 import re
 from datetime import datetime
 from getpass import getuser
-from platform import uname, python_version
+from platform import python_version, uname
 from shutil import disk_usage, which
 from socket import gethostname
-from subprocess import Popen, PIPE
+from subprocess import PIPE, Popen
 from sys import platform
 from time import time
 
-from psutil import boot_time, virtual_memory, disk_partitions
-
+from psutil import boot_time, disk_partitions, virtual_memory
 from telethon import functions
+from telethon.tl.types import Channel, Chat, User
 from telethon.version import __version__ as telethon_version
-from telethon.tl.types import User, Chat, Channel
 
 from pagermaid.common.status import get_status
 from pagermaid.config import Config
 from pagermaid.enums import Client, Message
 from pagermaid.listener import listener
-from pagermaid.utils import lang, execute
-from pagermaid.version import pgm_version
+from pagermaid.utils import execute, lang
 
 DCs = {
     1: "149.154.175.50",

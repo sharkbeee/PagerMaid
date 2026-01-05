@@ -3,7 +3,7 @@ import json
 import math
 import os
 from pathlib import Path
-from typing import Optional, List, Tuple, Dict
+from typing import Dict, List, Optional, Tuple
 
 from pydantic import BaseModel, ValidationError
 
@@ -142,7 +142,7 @@ class PluginManager:
     def load_local_version_map(self):
         if not os.path.exists(plugins_path / "version.json"):
             return
-        with open(plugins_path / "version.json", "r", encoding="utf-8") as f:
+        with open(plugins_path / "version.json", encoding="utf-8") as f:
             self.version_map = json.load(f)
 
     def save_local_version_map(self):

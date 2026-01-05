@@ -1,13 +1,13 @@
 """PagerMaid module to manage plugins."""
 
 import contextlib
-from os import remove, path, sep
+from os import path, remove, sep
 from os.path import exists
-from re import search, I
+from re import I, search
 from shutil import copyfile, move
 from typing import TYPE_CHECKING
 
-from pagermaid.common.plugin import plugin_remote_manager, plugin_manager
+from pagermaid.common.plugin import plugin_manager, plugin_remote_manager
 from pagermaid.common.reload import reload_all
 from pagermaid.enums import Message
 from pagermaid.listener import listener

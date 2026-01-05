@@ -1,4 +1,4 @@
-from amis import InputText, Switch, Card, CardsCRUD, PageSchema, Page
+from amis import Card, CardsCRUD, InputText, Page, PageSchema, Switch
 
 card = Card(
     header=Card.Header(

@@ -1,4 +1,5 @@
-from pagermaid.dependence import sqlite, scheduler, client
+from pagermaid.dependence import client, scheduler, sqlite
+
 from ._bot import bot
 
 __all__ = [

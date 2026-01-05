@@ -2,32 +2,32 @@
 
 from io import BytesIO
 from os import remove
-from typing import Optional, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from PIL import Image
 from telethon.errors import ImageProcessFailedError, PhotoCropSizeSmallError
 from telethon.errors.rpcerrorlist import (
-    PhotoExtInvalidError,
-    UsernameOccupiedError,
     AboutTooLongError,
     FirstNameInvalidError,
+    PhotoExtInvalidError,
     UsernameInvalidError,
     UsernameNotModifiedError,
+    UsernameOccupiedError,
 )
 from telethon.tl.functions.account import UpdateProfileRequest, UpdateUsernameRequest
+from telethon.tl.functions.channels import GetFullChannelRequest
+from telethon.tl.functions.contacts import BlockRequest, UnblockRequest
 from telethon.tl.functions.photos import (
     DeletePhotosRequest,
     GetUserPhotosRequest,
     UploadProfilePhotoRequest,
 )
 from telethon.tl.functions.users import GetFullUserRequest
-from telethon.tl.functions.channels import GetFullChannelRequest
-from telethon.tl.functions.contacts import BlockRequest, UnblockRequest
 from telethon.tl.types import (
-    InputPhoto,
-    MessageMediaPhoto,
-    MessageEntityMentionName,
     Channel,
+    InputPhoto,
+    MessageEntityMentionName,
+    MessageMediaPhoto,
     User,
 )
 

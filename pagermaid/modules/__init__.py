@@ -2,7 +2,7 @@
 
 from glob import glob
 from os import getcwd, makedirs, sep
-from os.path import dirname, basename, isfile, exists
+from os.path import basename, dirname, exists, isfile
 
 from pagermaid.utils import lang, logs
 

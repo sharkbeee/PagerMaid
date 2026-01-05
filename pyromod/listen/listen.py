@@ -2,8 +2,8 @@ import telethon
 from telethon.tl.patched import Message
 
 from pagermaid.dependence import add_delete_message_job
-from ..methods.get_dialogs_list import get_dialogs_list as get_dialogs_list_func
 
+from ..methods.get_dialogs_list import get_dialogs_list as get_dialogs_list_func
 from ..utils import patch, patchable
 from ..utils.handler_priority import HandlerList
 

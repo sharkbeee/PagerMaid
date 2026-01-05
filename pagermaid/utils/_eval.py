@@ -1,8 +1,8 @@
 import subprocess
-from importlib.util import find_spec
-from sys import executable
 from asyncio import create_subprocess_shell
 from asyncio.subprocess import PIPE
+from importlib.util import find_spec
+from sys import executable
 from typing import Optional
 
 

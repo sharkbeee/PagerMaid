@@ -3,15 +3,14 @@ import base64
 import functools
 from concurrent.futures import ThreadPoolExecutor
 from getpass import getpass
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from pyqrcode import QRCode
-
 from telethon import functions, types
 from telethon.errors import BadRequestError, SessionPasswordNeededError
 
 from pagermaid.config import Config
-from pyromod.utils.errors import QRCodeWebNeedPWDError, QRCodeWebCodeError
+from pyromod.utils.errors import QRCodeWebCodeError, QRCodeWebNeedPWDError
 
 if TYPE_CHECKING:
     from telethon import TelegramClient

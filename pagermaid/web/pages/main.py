@@ -1,9 +1,9 @@
-from amis import App, PageSchema, Tpl, Page, Flex
+from amis import App, Flex, Page, PageSchema, Tpl
 
 from pagermaid.web.html import get_footer, get_github_logo
 from pagermaid.web.pages.command_alias import page as command_alias_page
-from pagermaid.web.pages.ignore_groups import page as ignore_groups_page
 from pagermaid.web.pages.home_page import page as home_page
+from pagermaid.web.pages.ignore_groups import page as ignore_groups_page
 from pagermaid.web.pages.plugin_local_manage import page as plugin_local_manage_page
 from pagermaid.web.pages.plugin_remote_manage import page as plugin_remote_manage_page
 

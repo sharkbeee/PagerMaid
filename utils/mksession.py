@@ -1,5 +1,5 @@
 from telethon import TelegramClient
-from yaml import load, FullLoader
+from yaml import FullLoader, load
 
 config = load(open(r"config.yml"), Loader=FullLoader)
 api_key = config["api_key"]
