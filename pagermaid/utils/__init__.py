@@ -1,3 +1,5 @@
+# ruff: noqa: F401, F403
+
 from ._config_utils import *
 from ._eval import *
 from ._log import *

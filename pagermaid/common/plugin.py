@@ -267,10 +267,10 @@ class PluginManager:
         return False
 
     async def install_remote_plugin(self, name: str) -> bool:
-        if plugin := self.get_remote_plugin(name):
-            if await plugin.install():
-                self.set_local_version(name, plugin.version)
-                return True
+        plugin = self.get_remote_plugin(name)
+        if plugin and await plugin.install():
+            self.set_local_version(name, plugin.version)
+            return True
         return False
 
     async def update_remote_plugin(self, name: str) -> bool:

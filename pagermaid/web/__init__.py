@@ -10,13 +10,13 @@ from pagermaid.utils import logs
 from pagermaid.web.api import base_api_router, base_html_router
 from pagermaid.web.pages import admin_app, login_page
 
-requestAdaptor = """
+request_adaptor = """
 requestAdaptor(api) {
     api.headers["token"] = localStorage.getItem("token");
     return api;
 },
 """
-responseAdaptor = """
+response_adaptor = """
 responseAdaptor(api, payload, query, request, response) {
     if (response.data.detail == '登录验证失败或已失效，请重新登录') {
         window.location.href = '/login'
@@ -58,8 +58,8 @@ class Web:
             return admin_app.render(
                 site_title="PagerMaid-Modify 后台管理",
                 site_icon=icon_path,
-                requestAdaptor=requestAdaptor,
-                responseAdaptor=responseAdaptor,
+                requestAdaptor=request_adaptor,
+                responseAdaptor=response_adaptor,
             )
 
         @self.app.get("/login", response_class=HTMLResponse)

@@ -187,7 +187,7 @@ async def re(message: Message):
                 return
         await message.safe_delete()
         forward_allowed = True
-        for nums in range(0, num):
+        for _ in range(0, num):
             try:
                 if forward_allowed:
                     await reply.forward_to(reply.peer_id)

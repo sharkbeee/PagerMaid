@@ -95,15 +95,15 @@ async def plugin_install(message: "Message"):
                             failed_list.append(i)
                     except Exception:
                         failed_list.append(i)
-            else:
-                failed_list.append(i)
-        text = f"<b>{lang('apt_name')}</b>\n\n"
-        if len(success_list) > 0:
-            text += lang("apt_install_success") + " : %s\n" % ", ".join(success_list)
-        if len(failed_list) > 0:
-            text += lang("apt_not_found") + " %s\n" % ", ".join(failed_list)
-        if len(no_need_list) > 0:
-            text += lang("apt_no_update") + " %s\n" % ", ".join(no_need_list)
+        else:
+            failed_list.append(i)
+    text = f"<b>{lang('apt_name')}</b>\n\n"
+    if len(success_list) > 0:
+        text += f"{lang('apt_install_success')} : {', '.join(success_list)}\n"
+    if len(failed_list) > 0:
+        text += f"{lang('apt_not_found')} {', '.join(failed_list)}\n"
+    if len(no_need_list) > 0:
+        text += f"{lang('apt_no_update')} {', '.join(no_need_list)}\n"
         await log(text)
         restart = len(success_list) > 0
         await message.edit(text, parse_mode="html")
@@ -365,8 +365,8 @@ async def plugin_list(message: "Message"):
 
     active, disabled, inactive = plugin_manager.get_plugins_status()
     active_set = set(active)
-    inactive_set = set(p.name for p in disabled)
-    disabled_set = set(p.name for p in inactive)
+    inactive_set = {p.name for p in disabled}
+    disabled_set = {p.name for p in inactive}
 
     page = 1
     if len(message.parameter) > 1:

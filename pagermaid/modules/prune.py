@@ -69,12 +69,12 @@ async def self_prune(message: Message):
             return None
     else:
         count = message.id - offset
-    async for message in message.client.iter_messages(
+    async for _message in message.client.iter_messages(
         message.chat_id, from_user="me", min_id=offset
     ):
         if count_buffer == count:
             break
-        msgs.append(message)
+        msgs.append(_message)
         count_buffer += 1
         if len(msgs) == 100:
             await message.client.delete_messages(message.chat_id, msgs)
@@ -119,14 +119,14 @@ async def your_prune(message: Message):
         pass
     count_buffer = 0
     msgs = []
-    async for message in message.client.iter_messages(
+    async for _message in message.client.iter_messages(
         message.chat_id,
         from_user=target.sender_id,
     ):
         if count_buffer == count:
             break
         count_buffer += 1
-        msgs.append(message)
+        msgs.append(_message)
         if len(msgs) == 100:
             await message.client.delete_messages(message.chat_id, msgs)
             msgs = []
@@ -165,6 +165,5 @@ async def delete(message: Message):
 async def send_prune_notify(context: "Message", count_buffer, count):
     return await context.client.send_message(
         context.chat_id,
-        "%s %s / %s %s"
-        % (lang("spn_deleted"), str(count_buffer), str(count), lang("prune_hint2")),
+        f"{lang('spn_deleted')} {count_buffer} / {count} {lang('prune_hint2')}",
     )

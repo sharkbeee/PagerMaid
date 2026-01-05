@@ -1,5 +1,6 @@
 """This module contains utils to configure your account."""
 
+import contextlib
 from io import BytesIO
 from os import remove
 from typing import TYPE_CHECKING, Optional, Union
@@ -50,10 +51,7 @@ async def username(context: "Message"):
     """Reconfigure your username."""
     if len(context.parameter) > 1:
         await context.edit(f"{lang('error_prefix')}{lang('arg_error')}｝")
-    if len(context.parameter) == 1:
-        result = context.parameter[0]
-    else:
-        result = ""
+    result = context.parameter[0] if len(context.parameter) == 1 else ""
     try:
         await context.client(UpdateUsernameRequest(result))
     except UsernameOccupiedError:
@@ -114,22 +112,19 @@ async def pfp(bot: "Client", context: "Message"):
     photo = None
     if not Config.SILENT:
         await context.edit(lang("pfp_process"))
-    if reply:
-        if reply.media:
-            if isinstance(reply.media, MessageMediaPhoto):
-                photo = await bot.download_media(message=reply.photo)
-            elif "image" in reply.media.document.mime_type.split("/"):
-                photo = await bot.download_file(reply.media.document)
-            else:
-                await context.edit(f"{lang('error_prefix')}{lang('pfp_e_notp')}")
+    if reply and reply.media:
+        if isinstance(reply.media, MessageMediaPhoto):
+            photo = await bot.download_media(message=reply.photo)
+        elif "image" in reply.media.document.mime_type.split("/"):
+            photo = await bot.download_file(reply.media.document)
+        else:
+            await context.edit(f"{lang('error_prefix')}{lang('pfp_e_notp')}")
 
     if photo:
         try:
             await bot(UploadProfilePhotoRequest(file=await bot.upload_file(photo)))
-            try:
+            with contextlib.suppress(BaseException):
                 remove(photo)
-            except:
-                pass
             await context.edit("头像修改成功啦 ~")
             return
         except PhotoCropSizeSmallError:
@@ -274,13 +269,13 @@ async def download_profile_photo(
     if not downloaded_photo:
         return
     try:
-        TARGET_WIDTH = 300
+        target_width = 300
         img = Image.open(downloaded_photo)
-        if img.width > TARGET_WIDTH:
+        if img.width > target_width:
             aspect_ratio = img.height / img.width
-            new_height = int(TARGET_WIDTH * aspect_ratio)
+            new_height = int(target_width * aspect_ratio)
             resized_img = img.resize(
-                (TARGET_WIDTH, new_height), Image.Resampling.BICUBIC
+                (target_width, new_height), Image.Resampling.BICUBIC
             )
     except Exception:
         pass
@@ -325,10 +320,8 @@ async def profile(context: "Message"):
     elif context.parameter:
         user_input = context.parameter[0]
         if user_input.isnumeric() or user_input.startswith("-100"):
-            try:
+            with contextlib.suppress(ValueError):
                 user_input = int(user_input)
-            except ValueError:
-                pass
         try:
             target_entity = await context.client.get_entity(user_input)
         except (TypeError, ValueError, OverflowError):
@@ -392,9 +385,10 @@ async def block_user(context: "Message"):
         (raw_user,) = context.parameter
         if raw_user.isnumeric():
             user = int(raw_user)
-        elif context.message.entities is not None:
-            if isinstance(context.message.entities[0], MessageEntityMentionName):
-                user = context.message.entities[0].user_id
+        elif context.message.entities is not None and isinstance(
+            context.message.entities[0], MessageEntityMentionName
+        ):
+            user = context.message.entities[0].user_id
     if not user and isinstance(current_chat, User):
         user = current_chat.id
     if not user:
@@ -432,9 +426,10 @@ async def unblock_user(context: "Message"):
         (raw_user,) = context.parameter
         if raw_user.isnumeric():
             user = int(raw_user)
-        elif context.message.entities is not None:
-            if isinstance(context.message.entities[0], MessageEntityMentionName):
-                user = context.message.entities[0].user_id
+        elif context.message.entities is not None and isinstance(
+            context.message.entities[0], MessageEntityMentionName
+        ):
+            user = context.message.entities[0].user_id
     if not user:
         await context.edit(f"{lang('error_prefix')}{lang('arg_error')}")
         return

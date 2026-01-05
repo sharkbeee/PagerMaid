@@ -26,13 +26,13 @@ def strtobool(val, default=False):
         return 1
     elif val in ("n", "no", "f", "false", "off", "0"):
         return 0
-    else:
-        print("[Degrade] invalid truth value %r" % (val,))
-        return default
+    print(f"[Degrade] invalid truth value {val!r}")
+    return default
 
 
 try:
-    config: Dict = load(open(CONFIG_PATH, encoding="utf-8"), Loader=FullLoader)
+    with open(CONFIG_PATH, encoding="utf-8") as _cfg:
+        config: Dict = load(_cfg, Loader=FullLoader)
 except FileNotFoundError:
     print(
         "The configuration file does not exist, and a new configuration file is being generated."
@@ -94,15 +94,15 @@ class Config:
         PROXY_HTTP_PORT = os.environ.get("PGM_PROXY_HTTP_PORT", config["http_port"])
         PROXY = None
         if PROXY_ADDRESS and PROXY_PORT:
-            PROXY = dict(
-                http=f"socks5://{PROXY_ADDRESS}:{PROXY_PORT}",
-                https=f"socks5://{PROXY_ADDRESS}:{PROXY_PORT}",
-            )
+            PROXY = {
+                "http": f"socks5://{PROXY_ADDRESS}:{PROXY_PORT}",
+                "https": f"socks5://{PROXY_ADDRESS}:{PROXY_PORT}",
+            }
         elif PROXY_HTTP_ADDRESS and PROXY_HTTP_PORT:
-            PROXY = dict(
-                http=f"http://{PROXY_HTTP_ADDRESS}:{PROXY_HTTP_PORT}",
-                https=f"http://{PROXY_HTTP_ADDRESS}:{PROXY_HTTP_PORT}",
-            )
+            PROXY = {
+                "http": f"http://{PROXY_HTTP_ADDRESS}:{PROXY_HTTP_PORT}",
+                "https": f"http://{PROXY_HTTP_ADDRESS}:{PROXY_HTTP_PORT}",
+            }
         GIT_SOURCE = os.environ.get("PGM_GIT_SOURCE", config["git_source"])
         try:
             with open(

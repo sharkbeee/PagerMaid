@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 from os import sep
 from pathlib import Path
 from signal import SIGABRT, SIGINT, SIGTERM
@@ -90,15 +91,11 @@ async def main():
     finally:
         if scheduler.running:
             scheduler.shutdown()
-        try:
+        with contextlib.suppress(ConnectionError):
             await bot.disconnect()
-        except ConnectionError:
-            pass
         if web.web_server:
-            try:
+            with contextlib.suppress(AttributeError):
                 await web.web_server.shutdown()
-            except AttributeError:
-                pass
 
 
 bot.loop.run_until_complete(main())
