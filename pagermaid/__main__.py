@@ -52,12 +52,11 @@ async def console_bot():
     except AuthKeyError:
         SessionFileManager.safe_remove_session()
         exit()
-    me = await bot.get_me()
-    bot.me = me
-    if me.bot:
+    bot.me = await bot.get_me()
+    if bot.me.bot:
         SessionFileManager.safe_remove_session()
         exit()
-    logs.info(f"{lang('save_id')} {me.first_name}({me.id})")
+    logs.info(f"{lang('save_id')} {bot.me.first_name}({bot.me.id})")
     await load_all()
 
 
@@ -67,12 +66,7 @@ async def web_bot():
     except AuthKeyError:
         SessionFileManager.safe_remove_session()
         exit()
-    if bot.me is not None:
-        me = await bot.get_me()
-        if me.bot:
-            SessionFileManager.safe_remove_session()
-            exit()
-    else:
+    if bot.me is None:
         logs.info("Please use web to login, path: web_login .")
 
 
