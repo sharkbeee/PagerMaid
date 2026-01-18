@@ -9,7 +9,7 @@ from telethon.errors import AuthTokenExpiredError, BadRequestError
 from pagermaid.common.reload import load_all
 from pagermaid.services import bot
 from pagermaid.utils import lang, logs
-from pagermaid.web.api import authentication
+from pagermaid.web.api.utils import authentication
 from pagermaid.web.html import get_web_login_html
 from pyromod.methods.sign_in_qrcode import authorize_by_qrcode_web
 from pyromod.utils.errors import QRCodeWebCodeError, QRCodeWebNeedPWDError
