@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from starlette.responses import JSONResponse
 
 from pagermaid.common.ignore import get_group_list, ignore_groups_manager
-from pagermaid.web.api import authentication
+from pagermaid.web.api.utils import authentication
 
 route = APIRouter()
 
