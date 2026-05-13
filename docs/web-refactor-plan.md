@@ -78,7 +78,7 @@ Design rules:
 
 ### Milestone 0. Inventory and Characterization
 
-Status: `planned`
+Status: `done`
 
 Goal:
 
