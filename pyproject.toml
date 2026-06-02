@@ -36,3 +36,48 @@ license = {text = "AGPL 3.0+"}
 dev = [
     "pytest>=8.3.5",
 ]
+
+# =========================
+# Ruff configuration
+# =========================
+[tool.ruff]
+# Match Black's default style to stay aligned with common Python tooling.
+line-length = 88
+
+# Do not explicitly restrict target-version yet.
+# target-version = "py313"
+
+[tool.ruff.lint]
+# Enabled rule groups:
+# E / W   -> pycodestyle, base style checks and warnings
+# F       -> pyflakes, unused variables, undefined names, and similar issues
+# UP      -> pyupgrade, recommendations for modern Python syntax
+# B       -> bugbear, common potential bugs and code smells
+# C4      -> comprehensions, comprehension-related simplification checks
+# I       -> isort, import ordering
+# N       -> pep8-naming, naming conventions
+# SIM     -> simplify, simplification suggestions
+select = ["E", "W", "F", "UP", "B", "C4", "I", "N", "SIM"]
+
+# Ignore E501 (line too long) because the project may contain:
+# - long URLs
+# - regular expressions
+# - Telegram-related text or commands
+# - strings that should not be split aggressively
+# Formatting still tries to respect line-length where practical.
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+# Package export files often import objects only to expose public APIs,
+# so ignore F401 (imported but unused) in __init__.py files.
+"__init__.py" = ["F401"]
+
+[tool.ruff.format]
+# Use double quotes to stay aligned with Black and common Python style.
+quote-style = "double"
+
+# Use spaces for indentation, following the Python standard convention.
+indent-style = "space"
+
+# Keep magic trailing comma behavior enabled for more stable multiline formatting.
+skip-magic-trailing-comma = false
