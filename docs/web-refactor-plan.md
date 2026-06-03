@@ -131,7 +131,7 @@ Exit criteria:
 
 ### Milestone 1. Web Settings Boundary
 
-Status: `planned`
+Status: `done`
 
 Goal:
 
