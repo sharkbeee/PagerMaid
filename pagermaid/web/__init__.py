@@ -1,85 +1,38 @@
 import asyncio
 
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
-from starlette.middleware.cors import CORSMiddleware
-from starlette.responses import RedirectResponse
 
-from pagermaid.config import Config
 from pagermaid.utils import logs
-from pagermaid.web.api import base_api_router, base_html_router
-from pagermaid.web.pages import admin_app, login_page
-
-request_adaptor = """
-requestAdaptor(api) {
-    api.headers["token"] = localStorage.getItem("token");
-    return api;
-},
-"""
-response_adaptor = """
-responseAdaptor(api, payload, query, request, response) {
-    if (response.data.detail == '登录验证失败或已失效，请重新登录') {
-        window.location.href = '/login'
-        window.localStorage.clear()
-        window.sessionStorage.clear()
-        window.alert('登录验证失败或已失效，请重新登录')
-    }
-    return payload
-},
-"""
-icon_path = "https://xtaolabs.com/pagermaid-logo.png"
+from pagermaid.web.app import create_app
+from pagermaid.web.settings import WebSettings
 
 
 class Web:
     def __init__(self):
-        self.app: FastAPI = FastAPI()
+        self.settings = WebSettings.from_legacy_config()
+        self.app: FastAPI = create_app(self.settings)
         self.web_server = None
         self.web_server_task = None
         self.bot_main_task = None
 
     def init_web(self):
-        self.app.include_router(base_api_router)
-        self.app.include_router(base_html_router)
-
-        self.app.add_middleware(
-            CORSMiddleware,
-            allow_origins=Config.WEB_ORIGINS,
-            allow_credentials=True,
-            allow_methods=["*"],
-            allow_headers=["*"],
-        )
-
-        @self.app.get("/", response_class=RedirectResponse)
-        async def index():
-            return "/admin"
-
-        @self.app.get("/admin", response_class=HTMLResponse)
-        async def admin():
-            return admin_app.render(
-                site_title="PagerMaid-Modify 后台管理",
-                site_icon=icon_path,
-                requestAdaptor=request_adaptor,
-                responseAdaptor=response_adaptor,
-            )
-
-        @self.app.get("/login", response_class=HTMLResponse)
-        async def login():
-            return login_page.render(
-                site_title="登录 | PagerMaid-Modify 后台管理",
-                site_icon=icon_path,
-            )
+        self.settings = WebSettings.from_legacy_config()
+        self.app = create_app(self.settings)
 
     async def start(self):
-        if not Config.WEB_ENABLE:
+        if not self.settings.enabled:
             return
-        if not Config.WEB_SECRET_KEY:
+        if not self.settings.secret_key:
             logs.warning("未设置 WEB_SECRET_KEY ，请勿将 PagerMaid-Modify 暴露在公网")
         import uvicorn
 
         self.init_web()
         self.web_server = uvicorn.Server(
             config=uvicorn.Config(
-                self.app, host=Config.WEB_HOST, port=Config.WEB_PORT, log_config=None
+                self.app,
+                host=self.settings.host,
+                port=self.settings.port,
+                log_config=None,
             )
         )
         server_config = self.web_server.config
