@@ -1,31 +1,10 @@
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
 from starlette.middleware.cors import CORSMiddleware
-from starlette.responses import RedirectResponse
 
 from pagermaid.web.api import base_api_router, base_html_router
 from pagermaid.web.lifespan import lifespan
-from pagermaid.web.pages import admin_app, login_page
+from pagermaid.web.routers import html_router
 from pagermaid.web.settings import WebSettings
-
-request_adaptor = """
-requestAdaptor(api) {
-    api.headers["token"] = localStorage.getItem("token");
-    return api;
-},
-"""
-response_adaptor = """
-responseAdaptor(api, payload, query, request, response) {
-    if (response.data.detail == '登录验证失败或已失效，请重新登录') {
-        window.location.href = '/login'
-        window.localStorage.clear()
-        window.sessionStorage.clear()
-        window.alert('登录验证失败或已失效，请重新登录')
-    }
-    return payload
-},
-"""
-icon_path = "https://xtaolabs.com/pagermaid-logo.png"
 
 
 def create_app(settings: WebSettings | None = None) -> FastAPI:
@@ -34,6 +13,7 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
 
     app.include_router(base_api_router)
     app.include_router(base_html_router)
+    app.include_router(html_router)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.allowed_origins,
@@ -41,25 +21,5 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-
-    @app.get("/", response_class=RedirectResponse)
-    async def index():
-        return "/admin"
-
-    @app.get("/admin", response_class=HTMLResponse)
-    async def admin():
-        return admin_app.render(
-            site_title="PagerMaid-Modify 后台管理",
-            site_icon=icon_path,
-            requestAdaptor=request_adaptor,
-            responseAdaptor=response_adaptor,
-        )
-
-    @app.get("/login", response_class=HTMLResponse)
-    async def login():
-        return login_page.render(
-            site_title="登录 | PagerMaid-Modify 后台管理",
-            site_icon=icon_path,
-        )
 
     return app
