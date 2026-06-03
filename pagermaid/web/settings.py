@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, List
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -16,7 +16,7 @@ class WebSettings(BaseModel):
     secret_key: str = "secret_key"
     host: str = "127.0.0.1"
     port: int = Field(default=3333, ge=1, le=65535)
-    allowed_origins: List[str] = Field(default_factory=lambda: ["*"])
+    allowed_origins: list[str] = Field(default_factory=lambda: ["*"])
 
     # Defined now, used later when dangerous web operations are isolated.
     enable_shell: bool = False
@@ -24,7 +24,7 @@ class WebSettings(BaseModel):
 
     @field_validator("allowed_origins", mode="before")
     @classmethod
-    def normalize_allowed_origins(cls, value: Any) -> List[str]:
+    def normalize_allowed_origins(cls, value: Any) -> list[str]:
         if value is None:
             return ["*"]
         if isinstance(value, str):

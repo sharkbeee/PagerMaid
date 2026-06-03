@@ -42,7 +42,9 @@ def test_web_settings_rejects_invalid_port(port: int):
         WebSettings(port=port)
 
 
-def test_web_settings_does_not_load_environment_directly(monkeypatch: pytest.MonkeyPatch):
+def test_web_settings_does_not_load_environment_directly(
+    monkeypatch: pytest.MonkeyPatch,
+):
     monkeypatch.setenv("HOST", "0.0.0.0")
     monkeypatch.setenv("PORT", "9999")
 
