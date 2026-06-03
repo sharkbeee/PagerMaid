@@ -168,7 +168,7 @@ Exit criteria:
 
 ### Milestone 2. App Factory and Router Split
 
-Status: `planned`
+Status: `done`
 
 Goal:
 
