@@ -27,7 +27,7 @@ These surfaces are currently wired into the running UI or startup flow and shoul
 | `/admin` | Main admin entrypoint | Rendered directly by current web app |
 | `/login` | Main login entrypoint | Used by current AMIS admin flow |
 | `/web_login` | QR login HTML entrypoint | Used for web-based login flow when enabled |
-| `POST /pagermaid/api/login` | Current login form target | Current AMIS login expects `{status, msg, data{token}}` |
+| `POST /pagermaid/api/login` | Current login form target | AMIS login expects `{status, msg, data{version}}`; session is transported by `token_ck` cookie |
 | `GET /pagermaid/api/status` | Home page status widget | Used by AMIS service component |
 | `GET /pagermaid/api/log` | Home page log viewer | Used by AMIS log dialog |
 | `GET /pagermaid/api/command_alias` | Alias page initial data | Used by AMIS form `initApi` |
@@ -47,12 +47,27 @@ These surfaces or behaviors can change during the refactor, but the change shoul
 
 | Surface / Behavior | Why It Can Change | Migration Expectation |
 | --- | --- | --- |
-| Auth transport details | Current auth design is a refactor target | Update AMIS login/admin adaptors and document new flow |
-| Cookie configuration | Current cookie behavior is weak and incomplete | Document new cookie semantics |
-| `localStorage` token usage | Planned for removal | Update UI and auth docs together |
+| Auth transport details | Current auth design was a refactor target | Milestone 3 changed protected API auth to cookie sessions |
+| Cookie configuration | Cookie behavior is now explicit and settings-driven | Document production requirements when exposing the admin UI |
+| `localStorage` token usage | Removed in Milestone 3 | Do not reintroduce frontend token storage |
 | Router/module layout | Internal implementation detail | No external migration needed if routes remain stable |
 | Exact response model typing | Refactor target | Keep effective JSON shape stable where UI depends on it |
 | `/pagermaid/api/web_login` flow details | Current QR login state model is unstable | Document changes if flow semantics shift |
+
+## Milestone 3 Auth Baseline
+
+Milestone 3 intentionally changes the authentication contract.
+
+- Protected APIs require a valid `token_ck` session cookie.
+- `POST /pagermaid/api/login` sets the `token_ck` cookie on success.
+- `POST /pagermaid/api/login` no longer returns a reusable frontend token in `data.token`.
+- `POST /pagermaid/api/logout` clears the session cookie.
+- `GET /pagermaid/api/session-check` verifies the current session.
+- The `token` request header no longer authenticates protected APIs.
+- Raw `WEB_SECRET_KEY` is no longer accepted as an API authentication token.
+- Unauthenticated protected API requests return `401`.
+- Session cookies are `HttpOnly`, `SameSite=Lax` by default, and `Secure` only when configured.
+- Production deployments should enable secure cookies behind HTTPS and a reverse proxy.
 
 ## Can Be Deprecated
 

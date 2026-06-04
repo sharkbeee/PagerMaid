@@ -212,7 +212,7 @@ Exit criteria:
 
 ### Milestone 3. Authentication Consolidation
 
-Status: `planned`
+Status: `done`
 
 Goal:
 
@@ -321,6 +321,7 @@ Other sensitive actions that require review during the refactor:
 Use this section for short status updates instead of scattering temporary notes across the repo.
 
 - `2026-04-05`: Reframed the web refactor into milestone structure with inventory-first sequencing.
+- `2026-06-04`: Completed Milestone 3 authentication consolidation with cookie-based sessions.
 
 ## Exit Condition for the Refactor Track
 
