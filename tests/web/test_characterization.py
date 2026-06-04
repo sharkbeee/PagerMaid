@@ -8,6 +8,12 @@ from pagermaid.config import Config
 from pagermaid.version import pgm_version_code
 
 
+async def login_client(client: AsyncClient):
+    return await client.post(
+        "/pagermaid/api/login", json={"password": Config.WEB_SECRET_KEY}
+    )
+
+
 @pytest.mark.anyio
 async def test_root_route_redirect(client: AsyncClient):
     r = await client.get("/", follow_redirects=False)
@@ -41,19 +47,22 @@ async def test_login_success_and_failure(client: AsyncClient):
     assert data.get("status") == 0
     assert data.get("msg") == "登录成功"
     assert data.get("data").get("version") == pgm_version_code
+    assert data.get("data").get("token") is None
     cookie = r.cookies
     assert cookie.get("token_ck") is not None
+    set_cookie = r.headers["set-cookie"].lower()
+    assert "httponly" in set_cookie
+    assert "samesite=lax" in set_cookie
 
 
 @pytest.mark.anyio
 async def test_command_alias_read_shape(
     client: AsyncClient,
 ):
-    auth_token = Config.WEB_SECRET_KEY
-    assert auth_token
+    r = await login_client(client)
+    assert r.status_code == status.HTTP_200_OK
 
-    headers: dict[str, str] = {"token": auth_token}
-    r = await client.get("/pagermaid/api/command_alias", headers=headers)
+    r = await client.get("/pagermaid/api/command_alias")
     assert r.status_code == status.HTTP_200_OK
     data = r.json()
     assert data.get("status") == 0
@@ -64,7 +73,6 @@ async def test_command_alias_read_shape(
     r = await client.get(
         "/pagermaid/api/test_command_alias",
         params={"message": message},
-        headers=headers,
     )
     assert r.status_code == status.HTTP_200_OK
     data = r.json()
@@ -77,11 +85,10 @@ async def test_command_alias_read_shape(
 async def test_local_plugin_list_shape(
     client: AsyncClient,
 ):
-    auth_token = Config.WEB_SECRET_KEY
-    assert auth_token
+    r = await login_client(client)
+    assert r.status_code == status.HTTP_200_OK
 
-    headers: dict[str, str] = {"token": auth_token}
-    r = await client.get("/pagermaid/api/get_local_plugins", headers=headers)
+    r = await client.get("/pagermaid/api/get_local_plugins")
     assert r.status_code == status.HTTP_200_OK
     data = r.json()
     assert data.get("status") == 0
@@ -96,14 +103,19 @@ async def test_status_shape_requires_auth_and_returns_expected_keys(
     client: AsyncClient,
 ):
     r = await client.get("/pagermaid/api/status")
-    assert r.status_code == status.HTTP_400_BAD_REQUEST
+    assert r.status_code == status.HTTP_401_UNAUTHORIZED
     assert r.json().get("detail") == "登录验证失败或已失效，请重新登录"
 
-    auth_token = Config.WEB_SECRET_KEY
-    assert auth_token
+    r = await client.get(
+        "/pagermaid/api/status", headers={"token": Config.WEB_SECRET_KEY}
+    )
+    assert r.status_code == status.HTTP_401_UNAUTHORIZED
+    assert r.json().get("detail") == "登录验证失败或已失效，请重新登录"
 
-    headers: dict[str, str] = {"token": auth_token}
-    r = await client.get("/pagermaid/api/status", headers=headers)
+    r = await login_client(client)
+    assert r.status_code == status.HTTP_200_OK
+
+    r = await client.get("/pagermaid/api/status")
     assert r.status_code == status.HTTP_200_OK
     data = r.json()
     keys = [
@@ -124,9 +136,35 @@ async def test_dangerous_endpoints_are_auth_gated(
     client: AsyncClient,
 ):
     r = await client.get("/pagermaid/api/run_eval")
-    assert r.status_code == status.HTTP_400_BAD_REQUEST
+    assert r.status_code == status.HTTP_401_UNAUTHORIZED
     assert r.json().get("detail") == "登录验证失败或已失效，请重新登录"
 
     r = await client.get("/pagermaid/api/run_sh")
-    assert r.status_code == status.HTTP_400_BAD_REQUEST
+    assert r.status_code == status.HTTP_401_UNAUTHORIZED
+    assert r.json().get("detail") == "登录验证失败或已失效，请重新登录"
+
+
+@pytest.mark.anyio
+async def test_session_check_and_logout(client: AsyncClient):
+    r = await client.get("/pagermaid/api/session-check")
+    assert r.status_code == status.HTTP_401_UNAUTHORIZED
+    assert r.json().get("detail") == "登录验证失败或已失效，请重新登录"
+
+    r = await login_client(client)
+    assert r.status_code == status.HTTP_200_OK
+
+    r = await client.get("/pagermaid/api/session-check")
+    assert r.status_code == status.HTTP_200_OK
+    data = r.json()
+    assert data.get("status") == 0
+    assert data.get("msg") == "ok"
+
+    r = await client.post("/pagermaid/api/logout")
+    assert r.status_code == status.HTTP_200_OK
+    data = r.json()
+    assert data.get("status") == 0
+    assert data.get("msg") == "退出登录成功"
+
+    r = await client.get("/pagermaid/api/session-check")
+    assert r.status_code == status.HTTP_401_UNAUTHORIZED
     assert r.json().get("detail") == "登录验证失败或已失效，请重新登录"
