@@ -86,14 +86,6 @@
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('confirm-password');
 
-    function getHeader() {
-        return {
-            headers: {
-                token: localStorage.getItem("token") || ""
-            }
-        }
-    }
-
     function redirectToLogin() {
         window.location.href = '/admin';
     }
@@ -149,7 +141,7 @@
         if (PWDDiv.style.display === 'block') {
             return;
         }
-        axios.get('pagermaid/api/web_login', getHeader())
+        axios.get('pagermaid/api/web_login')
             .then(function (response) {
                 const data = response.data;
                 console.log(data);
@@ -174,7 +166,7 @@
         }
         axios.post('pagermaid/api/web_login', {
             password: pwd
-        }, getHeader())
+        })
             .then(function (response) {
                 const data = response.data;
                 console.log(data);

@@ -6,7 +6,6 @@ from pagermaid.web.pages import admin_app, login_page
 
 request_adaptor = """
 requestAdaptor(api) {
-    api.headers["token"] = localStorage.getItem("token");
     return api;
 },
 """
@@ -14,8 +13,6 @@ response_adaptor = """
 responseAdaptor(api, payload, query, request, response) {
     if (response.data.detail == '登录验证失败或已失效，请重新登录') {
         window.location.href = '/login'
-        window.localStorage.clear()
-        window.sessionStorage.clear()
         window.alert('登录验证失败或已失效，请重新登录')
     }
     return payload

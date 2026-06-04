@@ -17,9 +17,6 @@ login_api = AmisAPI(
     url="/pagermaid/api/login",
     method="post",
     adaptor="""
-        if (payload.status == 0) {
-            localStorage.setItem("token", payload.data.token);
-        }
         return payload;
     """,
 )
