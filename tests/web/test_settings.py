@@ -14,6 +14,10 @@ def test_web_settings_defaults():
     assert settings.host == "127.0.0.1"
     assert settings.port == 3333
     assert settings.allowed_origins == ["*"]
+    assert settings.session_cookie_name == "token_ck"
+    assert settings.session_ttl_minutes == 30
+    assert settings.cookie_secure is False
+    assert settings.cookie_samesite == "lax"
     assert settings.enable_shell is False
     assert settings.enable_eval is False
 
@@ -40,6 +44,17 @@ def test_web_settings_allowed_origins_normalizes_comma_separated_string():
 def test_web_settings_rejects_invalid_port(port: int):
     with pytest.raises(ValidationError):
         WebSettings(port=port)
+
+
+@pytest.mark.parametrize("session_ttl_minutes", [0, -1])
+def test_web_settings_rejects_invalid_session_ttl(session_ttl_minutes: int):
+    with pytest.raises(ValidationError):
+        WebSettings(session_ttl_minutes=session_ttl_minutes)
+
+
+def test_web_settings_rejects_invalid_cookie_samesite():
+    with pytest.raises(ValidationError):
+        WebSettings(cookie_samesite="invalid")
 
 
 def test_web_settings_does_not_load_environment_directly(

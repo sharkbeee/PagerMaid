@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -17,6 +17,10 @@ class WebSettings(BaseModel):
     host: str = "127.0.0.1"
     port: int = Field(default=3333, ge=1, le=65535)
     allowed_origins: list[str] = Field(default_factory=lambda: ["*"])
+    session_cookie_name: str = "token_ck"
+    session_ttl_minutes: int = Field(default=30, gt=0)
+    cookie_secure: bool = False
+    cookie_samesite: Literal["lax", "strict", "none"] = "lax"
 
     # Defined now, used later when dangerous web operations are isolated.
     enable_shell: bool = False

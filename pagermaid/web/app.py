@@ -10,6 +10,7 @@ from pagermaid.web.settings import WebSettings
 def create_app(settings: WebSettings | None = None) -> FastAPI:
     settings = settings or WebSettings.from_legacy_config()
     app = FastAPI(lifespan=lifespan)
+    app.state.web_settings = settings
 
     register_exception_handlers(app)
     app.include_router(create_router())
