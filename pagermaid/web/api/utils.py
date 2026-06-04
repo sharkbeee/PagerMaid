@@ -1,34 +1,21 @@
-import datetime
-from typing import Optional
-
 import jwt
-from fastapi import Cookie, Depends, Header, HTTPException
+from fastapi import Depends, HTTPException, Request
 
-from pagermaid.config import Config
+from pagermaid.web.auth import decode_session_token
+from pagermaid.web.dependencies import get_web_settings
 
-ALGORITHM = "HS256"
-TOKEN_EXPIRE_MINUTES = 30
+AUTH_FAILED_DETAIL = "登录验证失败或已失效，请重新登录"
 
 
 def authentication():
-    def inner(token: Optional[str] = Header(None), token_ck: str = Cookie(None)):
-        _token = token or token_ck
-        if Config.WEB_SECRET_KEY:
-            if _token == Config.WEB_SECRET_KEY:
-                return
-            try:
-                jwt.decode(_token, Config.WEB_SECRET_KEY, algorithms=ALGORITHM)
-            except (jwt.PyJWTError, jwt.ExpiredSignatureError, AttributeError) as err:
-                raise HTTPException(
-                    status_code=400, detail="登录验证失败或已失效，请重新登录"
-                ) from err
+    def inner(request: Request):
+        settings = get_web_settings(request)
+        token = request.cookies.get(settings.session_cookie_name)
+        if not token:
+            raise HTTPException(status_code=401, detail=AUTH_FAILED_DETAIL)
+        try:
+            decode_session_token(token, settings)
+        except (jwt.PyJWTError, AttributeError) as err:
+            raise HTTPException(status_code=401, detail=AUTH_FAILED_DETAIL) from err
 
     return Depends(inner)
-
-
-def create_token():
-    data = {
-        "exp": datetime.datetime.now(datetime.timezone.utc)
-        + datetime.timedelta(minutes=TOKEN_EXPIRE_MINUTES),
-    }
-    return jwt.encode(data, Config.WEB_SECRET_KEY, algorithm=ALGORITHM)
