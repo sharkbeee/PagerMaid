@@ -50,16 +50,20 @@ async def get_status() -> Status:
     process.cpu_percent()
     await asyncio.sleep(0.1)
     cpu_percent = psutil.cpu_percent()
-    process_cpu_percent = process.cpu_percent() / psutil.cpu_count(logical=True)
+    cpu_count = psutil.cpu_count(logical=True) or 1
+    process_cpu_percent = process.cpu_percent() / cpu_count
     ram_stat = psutil.virtual_memory()
-    swap_stat = psutil.swap_memory()
+    try:
+        swap_percent = f"{psutil.swap_memory().percent}%"
+    except OSError:
+        swap_percent = "0%"
     process_ram_percent = process.memory_info().rss / ram_stat.total * 100
     return Status(
         version=pgm_version,
         run_time=uptime,
         cpu_percent=f"{cpu_percent}%",
         ram_percent=f"{ram_stat.percent}%",
-        swap_percent=f"{swap_stat.percent}%",
+        swap_percent=swap_percent,
         process_cpu_percent=f"{process_cpu_percent:.2f}%",
         process_ram_percent=f"{process_ram_percent:.2f}%",
     )
