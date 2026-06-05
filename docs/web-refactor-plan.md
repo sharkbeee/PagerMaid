@@ -254,7 +254,7 @@ Exit criteria:
 
 ### Milestone 4. Tests, Deployment, and Documentation
 
-Status: `planned`
+Status: `done`
 
 Goal:
 
@@ -322,6 +322,7 @@ Use this section for short status updates instead of scattering temporary notes 
 
 - `2026-04-05`: Reframed the web refactor into milestone structure with inventory-first sequencing.
 - `2026-06-04`: Completed Milestone 3 authentication consolidation with cookie-based sessions.
+- `2026-06-05`: Completed Milestone 4 tests, deployment guidance, and migration notes.
 
 ## Exit Condition for the Refactor Track
 
