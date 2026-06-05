@@ -20,53 +20,41 @@ This document is the maintainer-facing roadmap for PagerMaid. It is a living doc
 
 ## Current Focus
 
-- Web/admin refactor and hardening as the first priority.
 - Runtime reliability and reload safety.
 - Dependency and environment cleanup.
 - Clearer plugin lifecycle and plugin API boundaries.
 - Better maintainer and contributor documentation.
+- Recently completed: web/admin refactor and hardening.
+
+Remaining web/admin work should now be handled as normal maintenance or mid-term follow-up,
+not as a continuation of the completed web refactor track.
 
 ## Near Term
 
-### 1. Refactor and Harden the Web Module
+### 1. Completed: Refactor and Harden the Web Module
 
-The current `pagermaid/web` module should be treated as the highest-priority refactor area.
-The goal is not a cosmetic rewrite. The goal is to bring the web/admin surface in line with
-modern FastAPI and Pydantic practices, reduce security risk, and make the web stack testable
-and maintainable.
+The focused `pagermaid/web` hardening/refactor track is closed when the core closure scope is met.
+Remaining web/admin work should be tracked as normal maintenance or later roadmap work rather than
+as blockers for this completed track.
 
-Primary problems to address:
+Completed closure scope:
 
-- Replace direct web-module dependence on the monolithic import-time config with a typed web settings boundary, without introducing a second independent config system.
-- Introduce a proper FastAPI app factory and lifespan-based startup/shutdown flow.
-- Reduce or remove module-level mutable globals in auth, login state, and service wiring.
-- Redesign authentication so it does not rely on `localStorage`, direct secret reuse, or weak cookie defaults.
-- Replace raw `dict` request/response handling with typed Pydantic models and explicit HTTP status semantics.
-- Disable dangerous web operations such as `shell` and `eval` by default and keep them out of the normal network-exposed admin surface.
-- Tighten other sensitive admin operations such as update, restart, and plugin installation/removal.
-- Fix invalid or overly broad CORS defaults and clarify the intended deployment model for the admin UI.
-- Move HTML/template handling toward standard FastAPI patterns with reusable templates and mounted static assets.
-- Separate web UI concerns from bot/process control so routes do not directly manage global runtime state.
-- Add focused tests for auth, settings loading, route contracts, and critical admin workflows.
+- Documented the current web API surface and page-to-API mapping.
+- Introduced characterization coverage for the current web behavior.
+- Established a typed web settings boundary without creating a second independent config system.
+- Introduced a clearer FastAPI app assembly path.
+- Improved the admin authentication/session baseline.
+- Disabled dangerous web operations such as `shell` and `eval` by default.
+- Clarified deployment and compatibility expectations for the web/admin surface.
 
-Expected outcomes:
+Deferred web/admin follow-up:
 
-- The web app can be created and tested independently of full bot startup.
-- Web settings are explicit, typed, and easier to validate while still sourcing values from the existing config path during early migration.
-- Route contracts are documented by models instead of implicit response shapes.
-- Admin authentication is safer and easier to reason about.
-- The admin panel is designed to be exposed safely on a network behind HTTPS and a reverse proxy.
-- `shell` and `eval` are disabled in the web UI by default and treated as development-only capabilities.
-- The codebase is ready for a later decision to keep or replace the current AMIS-based UI.
-
-Suggested implementation order:
-
-1. Introduce a typed web settings adapter and an app factory.
-2. Refactor auth and session handling for safe network exposure.
-3. Disable `shell` and `eval` in the web admin by default and isolate other sensitive actions behind clearer boundaries.
-4. Add request/response models and standardized error handling.
-5. Rework templates/static assets and clean up UI integration while keeping AMIS temporarily.
-6. Add tests, deployment guidance, and migration notes.
+- Remove or replace AMIS if it no longer serves the project.
+- Further harden plugin mutation, update, restart, and other sensitive admin endpoints.
+- Expand web test coverage beyond the refactor closure baseline.
+- Improve deployment documentation and operator guidance.
+- Continue separating web routes from runtime/process control where it materially reduces risk.
+- Improve web/admin UX and operator feedback as part of broader admin maintenance.
 
 ### 2. Stabilize the Core Runtime
 
@@ -81,6 +69,7 @@ Suggested implementation order:
 - Audit third-party and forked dependencies.
 - Simplify local development and deployment instructions.
 - Add CI for linting, basic tests, and packaging validation.
+- Track low-risk web/admin cleanup, extra tests, and documentation fixes as normal maintenance.
 
 ### 4. Improve the Plugin Story
 
@@ -110,6 +99,7 @@ Suggested implementation order:
 - Review the current web/admin surface for security and maintainability.
 - Improve authentication, configuration handling, and operator feedback.
 - Clarify which management tasks belong in chat commands and which belong in the web UI.
+- Revisit larger web/admin follow-ups such as AMIS removal, UI redesign, and deeper admin hardening after core runtime work is more stable.
 
 ## Longer Term
 
