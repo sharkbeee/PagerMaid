@@ -2,14 +2,11 @@ from amis import (
     ActionType,
     Alert,
     Dialog,
-    DisplayModeEnum,
     Divider,
     Flex,
     Form,
     Group,
-    Horizontal,
     Html,
-    InputText,
     LevelEnum,
     Log,
     Page,
@@ -45,65 +42,6 @@ log_page = Log(
     },
 )
 
-cmd_input = Form(
-    mode=DisplayModeEnum.horizontal,
-    horizontal=Horizontal(left=0),
-    wrapWithPanel=False,
-    body=[
-        InputText(
-            name="command",
-            required=True,
-            clearable=True,
-            addOn=ActionType.Dialog(
-                label="执行",
-                level=LevelEnum.primary,
-                dialog=Dialog(
-                    title="命令执行结果",
-                    size="xl",
-                    body=Log(
-                        autoScroll=True,
-                        placeholder="执行命令中，请稍候...",
-                        operation=["stop", "showLineNumber", "filter"],
-                        source={
-                            "method": "get",
-                            "url": "/pagermaid/api/run_sh?cmd=${command | raw}",
-                        },
-                    ),
-                ),
-            ),
-        )
-    ],
-)
-eval_input = Form(
-    mode=DisplayModeEnum.horizontal,
-    horizontal=Horizontal(left=0),
-    wrapWithPanel=False,
-    body=[
-        InputText(
-            name="command",
-            required=True,
-            clearable=True,
-            addOn=ActionType.Dialog(
-                label="执行",
-                level=LevelEnum.primary,
-                dialog=Dialog(
-                    title="命令执行结果",
-                    size="xl",
-                    body=Log(
-                        autoScroll=True,
-                        placeholder="执行命令中，请稍候...",
-                        operation=["stop", "showLineNumber", "filter"],
-                        source={
-                            "method": "get",
-                            "url": "/pagermaid/api/run_eval?cmd=${command | raw}",
-                        },
-                    ),
-                ),
-            ),
-        )
-    ],
-)
-
 operation_button = Flex(
     justify="center",
     items=[
@@ -136,18 +74,6 @@ operation_button = Flex(
                     Form(body=[Group(body=[select_log_num]), log_page]),
                 ],
             ),
-        ),
-        ActionType.Dialog(
-            label="shell",
-            className="m-l",
-            level=LevelEnum.warning,
-            dialog=Dialog(title="shell", size="lg", actions=[], body=[cmd_input]),
-        ),
-        ActionType.Dialog(
-            label="eval",
-            className="m-l",
-            level=LevelEnum.warning,
-            dialog=Dialog(title="eval", size="lg", actions=[], body=[eval_input]),
         ),
     ],
 )

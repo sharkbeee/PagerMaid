@@ -1,13 +1,14 @@
 import asyncio
 from typing import Union
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 
 from pagermaid.common.status import get_status
 from pagermaid.common.system import run_eval
 from pagermaid.utils import execute
 from pagermaid.web.api.utils import authentication
+from pagermaid.web.dependencies import get_web_settings
 
 route = APIRouter()
 
@@ -29,7 +30,11 @@ async def get_log(num: Union[int, str] = 100):
 
 
 @route.get("/run_eval", dependencies=[authentication()])
-async def run_cmd(cmd: str = ""):
+async def run_cmd(request: Request, cmd: str = ""):
+    settings = get_web_settings(request)
+    if not settings.enable_eval:
+        raise HTTPException(status_code=404, detail="Not Found")
+
     async def run_cmd_func():
         result = (await run_eval(cmd)).split("\n")
         for i in result:
@@ -40,7 +45,11 @@ async def run_cmd(cmd: str = ""):
 
 
 @route.get("/run_sh", dependencies=[authentication()])
-async def run_sh(cmd: str = ""):
+async def run_sh(request: Request, cmd: str = ""):
+    settings = get_web_settings(request)
+    if not settings.enable_shell:
+        raise HTTPException(status_code=404, detail="Not Found")
+
     async def run_sh_func():
         result = (await execute(cmd)).split("\n")
         for i in result:
