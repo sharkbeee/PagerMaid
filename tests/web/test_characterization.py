@@ -145,6 +145,30 @@ async def test_dangerous_endpoints_are_auth_gated(
 
 
 @pytest.mark.anyio
+async def test_dangerous_endpoints_are_disabled_by_default(
+    client: AsyncClient,
+):
+    r = await login_client(client)
+    assert r.status_code == status.HTTP_200_OK
+
+    r = await client.get("/pagermaid/api/run_eval")
+    assert r.status_code == status.HTTP_404_NOT_FOUND
+
+    r = await client.get("/pagermaid/api/run_sh")
+    assert r.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.anyio
+async def test_admin_page_does_not_expose_dangerous_endpoint_references(
+    client: AsyncClient,
+):
+    r = await client.get("/admin")
+    assert r.status_code == status.HTTP_200_OK
+    assert "/pagermaid/api/run_eval" not in r.text
+    assert "/pagermaid/api/run_sh" not in r.text
+
+
+@pytest.mark.anyio
 async def test_session_check_and_logout(client: AsyncClient):
     r = await client.get("/pagermaid/api/session-check")
     assert r.status_code == status.HTTP_401_UNAUTHORIZED
