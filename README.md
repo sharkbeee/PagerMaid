@@ -6,13 +6,13 @@
 
 一个人形自走 bot
 
-<img alt="star" src="https://img.shields.io/github/stars/TeamPGM/PagerMaid-Modify.svg"/>
-<img alt="fork" src="https://img.shields.io/github/forks/TeamPGM/PagerMaid-Modify.svg"/>
-<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/TeamPGM/PagerMaid-Modify.svg?label=commits">
-<img alt="size" src="https://img.shields.io/github/repo-size/TeamPGM/PagerMaid-Modify?color=pink"/>
-<img alt="issues" src="https://img.shields.io/github/issues/TeamPGM/PagerMaid-Modify.svg"/>
+<img alt="star" src="https://img.shields.io/github/stars/sharkbeee/PagerMaid.svg"/>
+<img alt="fork" src="https://img.shields.io/github/forks/sharkbeee/PagerMaid.svg"/>
+<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/sharkbeee/PagerMaid.svg?label=commits">
+<img alt="size" src="https://img.shields.io/github/repo-size/sharkbeee/PagerMaid?color=pink"/>
+<img alt="issues" src="https://img.shields.io/github/issues/sharkbeee/PagerMaid.svg"/>
 <img alt="docker" src="https://img.shields.io/docker/pulls/mrwangzhe/pagermaid_modify"/>
-<a href="https://github.com/TeamPGM/PagerMaid-Modify/blob/master/LICENSE"><img alt="license" src="https://img.shields.io/github/license/TeamPGM/PagerMaid-Modify.svg"/></a>
+<a href="https://github.com/sharkbeee/PagerMaid/blob/main/LICENSE"><img alt="license" src="https://img.shields.io/github/license/sharkbeee/PagerMaid.svg"/></a>
 <img alt="telethon" src="https://img.shields.io/badge/telethon-blue.svg"/>
 
 </div>
