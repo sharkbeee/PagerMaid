@@ -2,6 +2,7 @@
 
 This document summarizes web/admin behavior changes introduced during the web refactor milestones.
 It is intended for maintainers and operators upgrading from the pre-refactor web implementation.
+These notes apply to the PagerMaid 1.6.0 release.
 
 ## Authentication Changes
 
