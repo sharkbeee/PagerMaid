@@ -56,7 +56,10 @@ Deferred web/admin follow-up:
 - Continue separating web routes from runtime/process control where it materially reduces risk.
 - Improve web/admin UX and operator feedback as part of broader admin maintenance.
 
-### 2. Stabilize the Core Runtime
+### 2. In Progress: Stabilize the Core Runtime
+
+Detailed scope and status are tracked in
+[`docs/core-runtime-stabilization-plan.md`](docs/core-runtime-stabilization-plan.md).
 
 - Audit startup, shutdown, and reload behavior.
 - Reduce reliance on fragile global mutable state.
