@@ -185,7 +185,7 @@ Exit criteria:
 
 ### Milestone 3. Structured Load and Reload Results
 
-Status: `planned`
+Status: `done`
 
 Deliverables:
 

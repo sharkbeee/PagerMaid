@@ -1,8 +1,10 @@
+import asyncio
 from types import SimpleNamespace
 
 import pytest
 
 from pagermaid.common import reload as runtime_reload
+from pagermaid.hook import HookFailure
 
 
 class ClearRecorder:
@@ -44,7 +46,7 @@ async def test_load_all_continues_after_failures_and_runs_startup_hooks(monkeypa
     monkeypatch.setattr(runtime_reload.HookRunner, "load_success_exec", load_success)
     monkeypatch.setattr(runtime_reload.HookRunner, "startup", startup)
 
-    await runtime_reload.load_all()
+    result = await runtime_reload.load_all()
 
     assert events == [
         "import:pagermaid.modules.module_ok",
@@ -59,6 +61,18 @@ async def test_load_all_continues_after_failures_and_runs_startup_hooks(monkeypa
     ]
     assert modules.module_list == ["module_ok", "module_bad", "module_later"]
     assert modules.plugin_list == ["plugin_ok", "plugin_later"]
+    assert result.operation == runtime_reload.RuntimeOperation.STARTUP
+    assert result.status == runtime_reload.RuntimeStatus.PARTIAL_FAILURE
+    assert result.succeeded is False
+    assert result.loaded_modules == ["module_ok", "module_later"]
+    assert result.loaded_plugins == ["plugin_ok", "plugin_later"]
+    assert [
+        (failure.stage, failure.component, failure.exception_type)
+        for failure in result.failures
+    ] == [
+        ("module", "module_bad", "RuntimeError"),
+        ("plugin", "plugin_bad", "RuntimeError"),
+    ]
 
 
 @pytest.mark.anyio
@@ -134,7 +148,7 @@ async def test_reload_all_clears_state_before_reloading_and_runs_reload_hooks(
         lambda: events.append("plugin_manager:save_local_version_map"),
     )
 
-    await runtime_reload.reload_all()
+    result = await runtime_reload.reload_all()
 
     assert events == [
         "hook:reload_pre",
@@ -155,3 +169,61 @@ async def test_reload_all_clears_state_before_reloading_and_runs_reload_hooks(
         "plugin_manager:save_local_version_map",
         "hook:load_success",
     ]
+    assert result.operation == runtime_reload.RuntimeOperation.RELOAD
+    assert result.status == runtime_reload.RuntimeStatus.SUCCESS
+    assert result.succeeded is True
+    assert result.loaded_modules == ["module_ok"]
+    assert result.loaded_plugins == ["plugin_ok"]
+    assert result.failures == []
+
+
+@pytest.mark.anyio
+async def test_load_all_includes_hook_failures_in_result(monkeypatch):
+    modules = SimpleNamespace(module_list=[], plugin_list=[])
+    monkeypatch.setattr(runtime_reload.pagermaid, "modules", modules)
+    monkeypatch.setattr(
+        runtime_reload.plugin_manager, "load_local_plugins", lambda: None
+    )
+
+    async def load_success():
+        return [
+            HookFailure(
+                hook_type="load_success",
+                hook_name="plugins.example.after_load",
+                exception_type="RuntimeError",
+                message="hook failed",
+            )
+        ]
+
+    async def startup():
+        return []
+
+    monkeypatch.setattr(runtime_reload.HookRunner, "load_success_exec", load_success)
+    monkeypatch.setattr(runtime_reload.HookRunner, "startup", startup)
+
+    result = await runtime_reload.load_all()
+
+    assert result.status == runtime_reload.RuntimeStatus.PARTIAL_FAILURE
+    assert result.succeeded is False
+    assert result.failures == [
+        runtime_reload.RuntimeFailure(
+            stage="hook:load_success",
+            component="plugins.example.after_load",
+            exception_type="RuntimeError",
+            message="hook failed",
+        )
+    ]
+
+
+@pytest.mark.anyio
+async def test_load_all_does_not_swallow_cancellation(monkeypatch):
+    modules = SimpleNamespace(module_list=["cancelled"], plugin_list=[])
+    monkeypatch.setattr(runtime_reload.pagermaid, "modules", modules)
+
+    def import_module(_):
+        raise asyncio.CancelledError
+
+    monkeypatch.setattr(runtime_reload.importlib, "import_module", import_module)
+
+    with pytest.raises(asyncio.CancelledError):
+        await runtime_reload.load_all()
