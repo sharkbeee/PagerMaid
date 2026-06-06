@@ -11,7 +11,7 @@
 ## 一键脚本安装
 
 ```
-wget https://gitlab.com/Xtao-Labs/pagermaid-modify/-/raw/master/utils/docker.sh
+wget https://raw.githubusercontent.com/sharkbeee/PagerMaid/main/utils/docker.sh
 bash docker.sh
 ```
 
@@ -22,7 +22,7 @@ bash docker.sh
 1. 准备脚本
 
 ```
-git clone https://gitlab.com/Xtao-Labs/pagermaid-modify.git pagermaid
+git clone https://github.com/sharkbeee/PagerMaid.git pagermaid
 cd pagermaid
 cp docker-compose.gen.yml docker-compose.yml
 ```
@@ -34,4 +34,3 @@ cp docker-compose.gen.yml docker-compose.yml
 4. 启动容器`docker-compose up -d`。
 
 5. 运行`docker exec -it pagermaid bash utils/docker-config.sh`进行配置。
-

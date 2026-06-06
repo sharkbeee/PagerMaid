@@ -73,7 +73,7 @@ RUN source ~/.bashrc \
     && useradd pagermaid -r -m -d /pagermaid -s /bin/bash \
     && usermod -aG sudo,users pagermaid \
     ## 克隆仓库
-    && git clone -b master https://github.com/TeamPGM/PagerMaid-Modify.git /pagermaid/workdir \
+    && git clone -b main https://github.com/sharkbeee/PagerMaid.git /pagermaid/workdir \
     && git config --global pull.ff only \
     ## pip install
     && pip install -r requirements.txt \
