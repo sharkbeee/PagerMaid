@@ -23,6 +23,8 @@ from pagermaid.services import client as request
 from pagermaid.services import scheduler
 from pagermaid.utils import logs
 
+MIXPANEL_ENABLED = Config.ALLOW_ANALYTIC and bool(Config.MIXPANEL_API)
+
 
 class DatetimeSerializer(json.JSONEncoder):
     def default(self, obj):
@@ -55,6 +57,8 @@ class Mixpanel:
         return json.dumps(data, separators=(",", ":"), cls=cls)
 
     async def api_call(self, endpoint, json_message):
+        if not self._token:
+            return
         _endpoints = {
             "events": f"https://{self.api_host}/track",
             "people": f"https://{self.api_host}/engage",
@@ -115,7 +119,7 @@ mp = Mixpanel(Config.MIXPANEL_API)
 
 
 async def set_people(bot: Client, force_update: bool = False):
-    if not Config.ALLOW_ANALYTIC:
+    if not MIXPANEL_ENABLED:
         return
     if mp.is_people_set and (not force_update):
         return
@@ -129,7 +133,7 @@ async def set_people(bot: Client, force_update: bool = False):
 
 @Hook.on_startup()
 async def mixpanel_init_id(bot: Client):
-    if not Config.ALLOW_ANALYTIC:
+    if not MIXPANEL_ENABLED:
         return
     await set_people(bot)
     add_log_sponsored_clicked_task()
@@ -138,7 +142,7 @@ async def mixpanel_init_id(bot: Client):
 
 @Hook.command_postprocessor()
 async def mixpanel_report(bot: Client, message: Message, command, sub_command):
-    if not Config.ALLOW_ANALYTIC:
+    if not MIXPANEL_ENABLED:
         return
     await set_people(bot)
     if not bot.me:
@@ -215,7 +219,7 @@ async def log_sponsored_clicked_one(username: str):
 
 
 async def log_sponsored_clicked():
-    if not Config.ALLOW_ANALYTIC:
+    if not MIXPANEL_ENABLED:
         return
     await set_people(userbot)
     if not userbot.me:

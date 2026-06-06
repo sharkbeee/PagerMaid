@@ -4,7 +4,7 @@ import asyncio
 import contextlib
 import sys
 from asyncio import CancelledError
-from time import gmtime, strftime, time
+from time import gmtime, strftime
 from traceback import format_exc
 
 from telethon import events
@@ -20,7 +20,6 @@ from telethon.errors import (
 from telethon.events import StopPropagation
 
 from pagermaid.common.ignore import ignore_groups_manager
-from pagermaid.config import Config
 from pagermaid.enums import Message
 from pagermaid.enums.command import CommandHandler, CommandHandlerDecorator
 from pagermaid.group_manager import Permission
@@ -32,7 +31,6 @@ from pagermaid.utils import (
     lang,
     logs,
 )
-from pagermaid.utils.bot_utils import attach_report
 from pagermaid.utils.listener import (
     format_exc as format_exc_text,
 )
@@ -228,13 +226,6 @@ def listener(**args) -> CommandHandlerDecorator:
                 )
 
                 logs.error(report)
-                if Config.ERROR_REPORT:
-                    await attach_report(
-                        report,
-                        f"exception.{time()}.pgm.txt",
-                        None,
-                        "PGM Error report generated.",
-                    )
                 await HookRunner.process_error_exec(
                     context, command, exc_info, exc_format
                 )

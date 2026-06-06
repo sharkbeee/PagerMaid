@@ -15,7 +15,7 @@ web_login: "False"
 
 # Either debug logging is enabled or not
 debug: "False"
-error_report: "True"
+error_report: "False"
 
 # Admin interface related
 web_interface:
@@ -73,7 +73,7 @@ update_delete: "True"
 ipv6: "False"
 
 # Analytics
-allow_analytic: "True"
+allow_analytic: "False"
 sentry_api: ""
 mixpanel_api: ""
 

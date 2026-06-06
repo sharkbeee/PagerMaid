@@ -13,7 +13,7 @@ api_hash: "HASH_HERE"
 
 # Either debug logging is enabled or not
 debug: "False"
-error_report: "True"
+error_report: "False"
 
 # Admin interface related
 web_interface:
@@ -72,7 +72,9 @@ update_check: "True"
 ipv6: "False"
 
 # Analytics
-allow_analytic: "True"
+allow_analytic: "False"
+sentry_api: ""
+mixpanel_api: ""
 
 # Speed_test cli path
 speed_test_path: ""

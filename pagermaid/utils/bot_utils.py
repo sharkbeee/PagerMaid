@@ -14,22 +14,6 @@ if TYPE_CHECKING:
     from pagermaid.enums import Message
 
 
-async def attach_report(plaintext, file_name, reply_id=None, caption=None):
-    """Attach plaintext as logs."""
-    with open(file_name, "w+") as file:
-        file.write(plaintext)
-    try:
-        async with bot.conversation("PagerMaid_Modify_bot") as conversation:
-            await conversation.send_message("/ping")
-            await bot.send_read_acknowledge(conversation.chat_id)
-            await bot.send_file(
-                1263764543, file_name, reply_to=reply_id, caption=caption
-            )
-    except Exception:  # noqa
-        pass
-    safe_remove(file_name)
-
-
 async def attach_log(plaintext, chat_id, file_name, reply_id=None, caption=None):
     """Attach plaintext as logs."""
     with open(file_name, "w+", encoding="utf-8") as file:

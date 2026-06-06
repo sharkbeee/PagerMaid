@@ -33,10 +33,9 @@ sentry_sdk_git_hash = (
     .stdout.decode()
     .strip()
 )
+SENTRY_ENABLED = Config.ERROR_REPORT and bool(Config.SENTRY_API)
 
-# fixme: Not enough for dynamic disable sentry,
-#  web server will still report if pgm start with Config.ERROR_REPORT = True
-if Config.ERROR_REPORT:
+if SENTRY_ENABLED:
     sentry_sdk.init(
         Config.SENTRY_API,
         traces_sample_rate=1.0,
@@ -53,6 +52,8 @@ else:
 
 @Hook.on_startup()
 async def sentry_init_id(bot: Client):
+    if not SENTRY_ENABLED:
+        return
     if not bot.me:
         bot.me = await bot.get_me()
     data = {"id": bot.me.id, "name": bot.me.first_name, "ip_address": "{{auto}}"}
@@ -63,7 +64,7 @@ async def sentry_init_id(bot: Client):
 
 @Hook.process_error()
 async def sentry_report(message: Message, command, exc_info, **_):
-    if not Config.ERROR_REPORT:
+    if not SENTRY_ENABLED:
         return
     sender_id = message.sender_id
     sentry_sdk.set_context(
