@@ -152,7 +152,7 @@ Exit criteria:
 
 ### Milestone 1. Runtime Characterization
 
-Status: `planned`
+Status: `done`
 
 Deliverables:
 
