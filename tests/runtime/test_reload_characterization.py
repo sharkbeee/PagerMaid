@@ -227,3 +227,66 @@ async def test_load_all_does_not_swallow_cancellation(monkeypatch):
 
     with pytest.raises(asyncio.CancelledError):
         await runtime_reload.load_all()
+
+
+@pytest.mark.anyio
+async def test_reload_all_rejects_concurrent_reload(monkeypatch):
+    started = asyncio.Event()
+    release = asyncio.Event()
+    calls = 0
+
+    async def blocked_reload():
+        nonlocal calls
+        calls += 1
+        started.set()
+        await release.wait()
+        return runtime_reload.RuntimeResult(
+            operation=runtime_reload.RuntimeOperation.RELOAD
+        )
+
+    monkeypatch.setattr(runtime_reload, "_reload_all", blocked_reload)
+
+    first_reload = asyncio.create_task(runtime_reload.reload_all())
+    await started.wait()
+    busy_result = await runtime_reload.reload_all()
+    release.set()
+    first_result = await first_reload
+
+    assert calls == 1
+    assert first_result.succeeded is True
+    assert busy_result.operation == runtime_reload.RuntimeOperation.RELOAD
+    assert busy_result.status == runtime_reload.RuntimeStatus.BUSY
+    assert busy_result.succeeded is False
+
+
+def test_reload_result_message_describes_busy_and_partial_failure(monkeypatch):
+    messages = {
+        "reload_busy": "busy",
+        "reload_partial_failure": "partial: {count}",
+        "reload_ok": "success",
+    }
+    monkeypatch.setattr(runtime_reload, "lang", messages.__getitem__)
+
+    busy = runtime_reload.RuntimeResult(
+        operation=runtime_reload.RuntimeOperation.RELOAD,
+        status=runtime_reload.RuntimeStatus.BUSY,
+    )
+    partial = runtime_reload.RuntimeResult(
+        operation=runtime_reload.RuntimeOperation.RELOAD,
+        status=runtime_reload.RuntimeStatus.PARTIAL_FAILURE,
+        failures=[
+            runtime_reload.RuntimeFailure(
+                stage="plugin",
+                component="broken",
+                exception_type="RuntimeError",
+                message="failed",
+            )
+        ],
+    )
+    success = runtime_reload.RuntimeResult(
+        operation=runtime_reload.RuntimeOperation.RELOAD
+    )
+
+    assert runtime_reload.reload_result_message(busy) == "busy"
+    assert runtime_reload.reload_result_message(partial) == "partial: 1"
+    assert runtime_reload.reload_result_message(success) == "success"

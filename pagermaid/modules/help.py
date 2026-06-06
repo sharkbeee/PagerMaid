@@ -3,7 +3,7 @@
 from os import listdir
 
 from pagermaid.common.alias import AliasManager
-from pagermaid.common.reload import reload_all
+from pagermaid.common.reload import reload_all, reload_result_message
 from pagermaid.config import CONFIG_PATH, Config
 from pagermaid.enums import Message
 from pagermaid.group_manager import enforce_permission
@@ -11,6 +11,13 @@ from pagermaid.listener import listener
 from pagermaid.static import help_messages
 from pagermaid.utils import lang
 from pagermaid.utils.listener import from_msg_get_sudo_uid, from_self
+
+
+async def reload_and_report_failure(message: Message) -> bool:
+    result = await reload_all()
+    if not result.succeeded:
+        await message.edit(reload_result_message(result))
+    return result.succeeded
 
 
 @listener(
@@ -171,7 +178,7 @@ async def lang_change(message: Message):
         with open(CONFIG_PATH, "w", encoding="utf-8") as f:
             f.write(file)
         await message.edit(f"{lang('lang_change_to')} {to_lang}, {lang('lang_reboot')}")
-        await reload_all()
+        await reload_and_report_failure(message)
     else:
         await message.edit(
             f"{lang('lang_current_lang')} {Config.LANGUAGE}\n\n"
@@ -203,7 +210,7 @@ async def alias_commands(message: Message):
         try:
             alias_manager.delete_alias(source_command)
             await message.edit(lang("alias_success"))
-            await reload_all()
+            await reload_and_report_failure(message)
         except KeyError:
             await message.edit(lang("alias_no_exist"))
             return
@@ -215,4 +222,4 @@ async def alias_commands(message: Message):
             return
         alias_manager.add_alias(source_command, to_command)
         await message.edit(lang("alias_success"))
-        await reload_all()
+        await reload_and_report_failure(message)

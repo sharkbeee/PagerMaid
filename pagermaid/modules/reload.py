@@ -1,4 +1,4 @@
-from pagermaid.common.reload import reload_all
+from pagermaid.common.reload import reload_all, reload_result_message
 from pagermaid.enums import Message
 from pagermaid.listener import listener
 from pagermaid.services import scheduler
@@ -11,8 +11,8 @@ from pagermaid.utils import lang
 )
 async def reload_plugins(message: Message):
     """To reload plugins."""
-    await reload_all()
-    await message.edit(lang("reload_ok"))
+    result = await reload_all()
+    await message.edit(reload_result_message(result))
 
 
 @scheduler.scheduled_job("cron", hour="4", id="reload.clear_read_context")

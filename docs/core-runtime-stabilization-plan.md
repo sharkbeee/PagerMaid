@@ -202,7 +202,7 @@ Exit criteria:
 
 ### Milestone 4. Serialized Reload
 
-Status: `planned`
+Status: `done`
 
 Deliverables:
 

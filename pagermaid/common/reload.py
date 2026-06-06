@@ -1,3 +1,4 @@
+import asyncio
 import importlib
 import os
 from dataclasses import dataclass, field
@@ -16,7 +17,9 @@ from pagermaid.static import (
     hook_functions,
     read_context,
 )
-from pagermaid.utils import logs
+from pagermaid.utils import lang, logs
+
+_reload_lock = asyncio.Lock()
 
 
 class RuntimeOperation(str, Enum):
@@ -108,7 +111,15 @@ def _complete(result: RuntimeResult) -> RuntimeResult:
     return result
 
 
-async def reload_all() -> RuntimeResult:
+def reload_result_message(result: RuntimeResult) -> str:
+    if result.status == RuntimeStatus.BUSY:
+        return lang("reload_busy")
+    if result.status == RuntimeStatus.PARTIAL_FAILURE:
+        return lang("reload_partial_failure").format(count=len(result.failures))
+    return lang("reload_ok")
+
+
+async def _reload_all() -> RuntimeResult:
     result = RuntimeResult(operation=RuntimeOperation.RELOAD)
     _record_hook_failures(result, await HookRunner.reload_pre_exec())
     read_context.clear()
@@ -142,6 +153,17 @@ async def reload_all() -> RuntimeResult:
     plugin_manager.save_local_version_map()
     _record_hook_failures(result, await HookRunner.load_success_exec())
     return _complete(result)
+
+
+async def reload_all() -> RuntimeResult:
+    if _reload_lock.locked():
+        logs.warning("Runtime reload rejected because another reload is in progress")
+        return RuntimeResult(
+            operation=RuntimeOperation.RELOAD,
+            status=RuntimeStatus.BUSY,
+        )
+    async with _reload_lock:
+        return await _reload_all()
 
 
 async def load_all() -> RuntimeResult:

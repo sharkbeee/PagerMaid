@@ -8,7 +8,7 @@ from shutil import copyfile, move
 from typing import TYPE_CHECKING
 
 from pagermaid.common.plugin import plugin_manager, plugin_remote_manager
-from pagermaid.common.reload import reload_all
+from pagermaid.common.reload import reload_all, reload_result_message
 from pagermaid.enums import Message
 from pagermaid.listener import listener
 from pagermaid.static import working_dir
@@ -17,6 +17,13 @@ from pagermaid.utils.bot_utils import log, upload_attachment
 
 if TYPE_CHECKING:
     from pagermaid.enums.command import CommandHandler
+
+
+async def reload_and_report_failure(message: "Message") -> bool:
+    result = await reload_all()
+    if not result.succeeded:
+        await message.edit(reload_result_message(result))
+    return result.succeeded
 
 
 def remove_plugin(name):
@@ -73,7 +80,7 @@ async def plugin_install(message: "Message"):
             parse_mode="html",
         )
         await log(f"{lang('apt_install_success')} {plugin_name}.")
-        await reload_all()
+        await reload_and_report_failure(message)
     elif len(message.parameter) >= 2:
         await plugin_manager.load_remote_plugins()
         process_list = message.parameter
@@ -108,7 +115,7 @@ async def plugin_install(message: "Message"):
         restart = len(success_list) > 0
         await message.edit(text, parse_mode="html")
         if restart:
-            await reload_all()
+            await reload_and_report_failure(message)
     else:
         await message.edit(lang("arg_error"))
 
@@ -125,7 +132,7 @@ async def plugin_remove(message: "Message"):
         if plugin_manager.remove_plugin(message.parameter[1]):
             await message.edit(f"{lang('apt_remove_success')} {message.parameter[1]}")
             await log(f"{lang('apt_remove')} {message.parameter[1]}.")
-            await reload_all()
+            await reload_and_report_failure(message)
         elif "/" in message.parameter[1]:
             await message.edit(lang("arg_error"))
         else:
@@ -182,7 +189,7 @@ async def plugin_enable(message: "Message"):
                 f"{lang('apt_plugin')} {message.parameter[1]} {lang('apt_enable')}"
             )
             await log(f"{lang('apt_enable')} {message.parameter[1]}.")
-            await reload_all()
+            await reload_and_report_failure(message)
         else:
             await message.edit(lang("apt_not_exist"))
     else:
@@ -203,7 +210,7 @@ async def plugin_disable(message: "Message"):
                 f"{lang('apt_plugin')} {message.parameter[1]} {lang('apt_disable')}"
             )
             await log(f"{lang('apt_disable')} {message.parameter[1]}.")
-            await reload_all()
+            await reload_and_report_failure(message)
         else:
             await message.edit(lang("apt_not_exist"))
     else:
@@ -281,7 +288,7 @@ async def plugin_update(message: "Message"):
             + "、".join(updated_plugins),
             parse_mode="html",
         )
-        await reload_all()
+        await reload_and_report_failure(message)
 
 
 @plugin.sub_command(

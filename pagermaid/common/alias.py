@@ -53,7 +53,7 @@ class AliasManager:
             temp = Alias(**i)
             Config.alias_dict[temp.command] = temp.alias
         AliasManager.save()
-        await reload_all()
+        return await reload_all()
 
     def test_alias(self, message: str) -> str:
         r = message.split(" ")

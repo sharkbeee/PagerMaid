@@ -586,6 +586,8 @@ sb_channel: Successfully blocked this channel in this group.
 #reload
 reload_des: Reload the PagerMaid-Modify instance.
 reload_ok: Successfully reloaded.
+reload_busy: Another reload is already in progress. Please try again later.
+reload_partial_failure: Reload completed with {count} failure(s). Check the logs for details.
 #conversation
 conversation_already_in_error: Another conversation is already in progress.
 conversation_timed_out_error: Response timed out.

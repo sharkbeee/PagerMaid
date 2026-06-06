@@ -2,10 +2,17 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
 from pagermaid.common.plugin import plugin_manager
-from pagermaid.common.reload import reload_all
+from pagermaid.common.reload import reload_all, reload_result_message
 from pagermaid.web.api.utils import authentication
 
 route = APIRouter()
+
+
+async def reload_error_response():
+    result = await reload_all()
+    if result.succeeded:
+        return None
+    return {"status": -100, "msg": reload_result_message(result)}
 
 
 @route.get(
@@ -31,7 +38,8 @@ async def set_local_plugin_status(data: dict):
         plugin.enable()
     else:
         plugin.disable()
-    await reload_all()
+    if response := await reload_error_response():
+        return response
     return {"status": 0, "msg": f"成功{'开启' if status else '关闭'} {module_name}"}
 
 
@@ -43,7 +51,8 @@ async def remove_local_plugin(data: dict):
     if not (plugin := plugin_manager.get_local_plugin(module_name)):
         return {"status": -100, "msg": f"插件 {module_name} 不存在"}
     plugin_manager.remove_plugin(plugin.name)
-    await reload_all()
+    if response := await reload_error_response():
+        return response
     return {"status": 0, "msg": f"成功卸载 {module_name}"}
 
 
@@ -71,5 +80,6 @@ async def set_remote_plugin_status(data: dict):
         await plugin_manager.install_remote_plugin(module_name)
     else:
         plugin_manager.remove_plugin(module_name)
-    await reload_all()
+    if response := await reload_error_response():
+        return response
     return {"status": 0, "msg": f"成功{'安装' if status else '卸载'} {module_name}"}

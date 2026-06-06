@@ -586,6 +586,8 @@ sb_channel: 成功在本群封禁此頻道。
 #reload
 reload_des: 重新加載內置模塊和插件。
 reload_ok: 重新加載內置模塊和插件成功。
+reload_busy: 另一個重新加載操作正在進行中，請稍後重試。
+reload_partial_failure: 重新加載已完成，但發生了 {count} 個錯誤，請檢查日誌。
 #conversation
 conversation_already_in_error: 另一個操作正在進行中，請稍等片刻後重試。
 conversation_timed_out_error: 響應超時，請稍等片刻後重試。

@@ -585,6 +585,8 @@ sb_channel: Successfully blocked this channel in this group.
 #reload
 reload_des: PagerMaid-Modifyインスタンスをリロードします。
 reload_ok: 再読み込みに成功しました。
+reload_busy: 別の再読み込みが進行中です。しばらくしてから再試行してください。
+reload_partial_failure: 再読み込みは完了しましたが、{count}件のエラーが発生しました。詳細はログを確認してください。
 #conversation
 conversation_already_in_error: すでに別の会話が進行中です。
 conversation_timed_out_error: 応答がタイムアウトしました。
