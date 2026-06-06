@@ -26,6 +26,19 @@ async def test_login_page(client: AsyncClient):
     r = await client.get("/login")
     assert r.status_code == status.HTTP_200_OK
     assert "登录 | PagerMaid-Modify 后台管理" in r.text
+    assert "/static/logo.jpg" in r.text
+    assert "https://xtaolabs.com/pagermaid-logo.png" not in r.text
+
+
+@pytest.mark.anyio
+async def test_local_logo_is_served(client: AsyncClient):
+    r = await client.get("/static/logo.jpg")
+    assert r.status_code == status.HTTP_200_OK
+    assert r.headers["content-type"] == "image/jpeg"
+    assert r.content
+
+    r = await client.get("/static/config.gen.yml")
+    assert r.status_code == status.HTTP_404_NOT_FOUND
 
 
 @pytest.mark.anyio
@@ -164,6 +177,8 @@ async def test_admin_page_does_not_expose_dangerous_endpoint_references(
 ):
     r = await client.get("/admin")
     assert r.status_code == status.HTTP_200_OK
+    assert "/static/logo.jpg" in r.text
+    assert "https://xtaolabs.com/pagermaid-logo.png" not in r.text
     assert "/pagermaid/api/run_eval" not in r.text
     assert "/pagermaid/api/run_sh" not in r.text
 

@@ -18,7 +18,7 @@ responseAdaptor(api, payload, query, request, response) {
     return payload
 },
 """
-icon_path = "https://xtaolabs.com/pagermaid-logo.png"
+icon_path = "/static/logo.jpg"
 
 router = APIRouter()
 

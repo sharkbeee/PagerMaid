@@ -16,7 +16,7 @@ header = Flex(
 )
 admin_app = App(
     brandName="pagermaid",
-    logo="https://xtaolabs.com/pagermaid-logo.png",
+    logo="/static/logo.jpg",
     header=header,
     pages=[
         {
