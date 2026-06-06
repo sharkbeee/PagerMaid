@@ -61,4 +61,4 @@ async def run_sh(request: Request, cmd: str = ""):
 
 @route.get("/status", response_class=JSONResponse, dependencies=[authentication()])
 async def status():
-    return (await get_status()).dict()
+    return (await get_status()).model_dump()
