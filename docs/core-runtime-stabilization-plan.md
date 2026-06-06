@@ -168,7 +168,7 @@ Exit criteria:
 
 ### Milestone 2. Hook Isolation and Command Diagnostics
 
-Status: `planned`
+Status: `done`
 
 Deliverables:
 

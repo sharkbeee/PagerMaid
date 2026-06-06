@@ -1,6 +1,6 @@
 import asyncio
-import sys
-from typing import TYPE_CHECKING
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Callable, List, Optional
 
 from telethon.events import StopPropagation
 
@@ -10,6 +10,14 @@ from pagermaid.utils import logs
 
 if TYPE_CHECKING:
     from pagermaid.enums import Message
+
+
+@dataclass(frozen=True)
+class HookFailure:
+    hook_type: str
+    hook_name: str
+    exception_type: str
+    message: str
 
 
 class Hook:
@@ -100,118 +108,105 @@ class Hook:
 
 class HookRunner:
     @staticmethod
-    async def startup():
-        if cors := [
-            startup(**inject(None, startup))  # noqa
-            for startup in hook_functions["startup"]
-        ]:  # noqa
-            try:
-                await asyncio.gather(*cors)
-            except Exception as exception:
-                logs.info(f"[startup]: {type(exception)}: {exception}")
+    def _hook_name(function: Callable) -> str:
+        module = getattr(function, "__module__", "")
+        name = getattr(function, "__qualname__", repr(function))
+        return f"{module}.{name}" if module else name
 
     @staticmethod
-    async def shutdown(message: "Message"):
-        if cors := [
-            shutdown(**inject(message, shutdown))  # noqa
-            for shutdown in hook_functions["shutdown"]
-        ]:  # noqa
-            try:
-                await asyncio.gather(*cors)
-            except Exception as exception:
-                logs.info(f"[shutdown]: {type(exception)}: {exception}")
-
-    @staticmethod
-    async def command_pre(message: "Message", command, sub_command):
-        cors = []
+    async def _run_hook(
+        hook_type: str,
+        function: Callable,
+        message: Optional["Message"],
+        **data,
+    ) -> Optional[HookFailure]:
+        hook_name = HookRunner._hook_name(function)
         try:
-            for pre in hook_functions["command_pre"]:
-                try:
-                    data = inject(
-                        message, pre, command=command, sub_command=sub_command
-                    )
-                except Exception as exception:
-                    logs.info(f"[process_error]: {type(exception)}: {exception}")
-                    continue
-                cors.append(pre(**data))  # noqa
-            if cors:
-                await asyncio.gather(*cors)
-        except SystemExit as e:
-            raise e
-        except StopPropagation as e:
-            raise StopPropagation from e
+            await function(**inject(message, function, **data))
+        except StopPropagation:
+            raise
         except Exception as exception:
-            logs.info(f"[command_pre]: {type(exception)}: {exception}")
+            logs.exception("Hook %s %s failed: %s", hook_type, hook_name, exception)
+            return HookFailure(
+                hook_type=hook_type,
+                hook_name=hook_name,
+                exception_type=type(exception).__name__,
+                message=str(exception),
+            )
+        return None
 
     @staticmethod
-    async def command_post(message: "Message", command, sub_command):
-        cors = []
-        try:
-            for post in hook_functions["command_post"]:
-                try:
-                    data = inject(
-                        message, post, command=command, sub_command=sub_command
-                    )
-                except Exception as exception:
-                    logs.info(f"[process_error]: {type(exception)}: {exception}")
-                    continue
-                cors.append(post(**data))  # noqa
-            if cors:
-                await asyncio.gather(*cors)
-        except SystemExit as e:
-            raise e
-        except StopPropagation as e:
-            raise StopPropagation from e
-        except Exception as exception:
-            logs.info(f"[command_post]: {type(exception)}: {exception}")
+    async def _run_hooks(
+        hook_type: str,
+        functions,
+        message: Optional["Message"] = None,
+        **data,
+    ) -> List[HookFailure]:
+        results = await asyncio.gather(
+            *[
+                HookRunner._run_hook(hook_type, function, message, **data)
+                for function in functions
+            ]
+        )
+        return [result for result in results if result is not None]
+
+    @staticmethod
+    async def startup() -> List[HookFailure]:
+        return await HookRunner._run_hooks("startup", hook_functions["startup"])
+
+    @staticmethod
+    async def shutdown(message: "Message") -> List[HookFailure]:
+        return await HookRunner._run_hooks(
+            "shutdown", hook_functions["shutdown"], message=message
+        )
+
+    @staticmethod
+    async def command_pre(
+        message: "Message", command, sub_command
+    ) -> List[HookFailure]:
+        return await HookRunner._run_hooks(
+            "command_pre",
+            hook_functions["command_pre"],
+            message=message,
+            command=command,
+            sub_command=sub_command,
+        )
+
+    @staticmethod
+    async def command_post(
+        message: "Message", command, sub_command
+    ) -> List[HookFailure]:
+        return await HookRunner._run_hooks(
+            "command_post",
+            hook_functions["command_post"],
+            message=message,
+            command=command,
+            sub_command=sub_command,
+        )
 
     @staticmethod
     async def process_error_exec(
         message: "Message", command, exc_info: BaseException, exc_format: str
-    ):
-        cors = []
+    ) -> List[HookFailure]:
         try:
-            for error in hook_functions["process_error"]:
-                try:
-                    data = inject(
-                        message,
-                        error,
-                        command=command,
-                        exc_info=exc_info,
-                        exc_format=exc_format,
-                    )
-                except Exception as exception:
-                    logs.info(f"[process_error]: {type(exception)}: {exception}")
-                    continue
-                cors.append(error(**data))  # noqa
-            if cors:
-                await asyncio.gather(*cors)
+            return await HookRunner._run_hooks(
+                "process_error",
+                hook_functions["process_error"],
+                message=message,
+                command=command,
+                exc_info=exc_info,
+                exc_format=exc_format,
+            )
         except SystemExit:
             await HookRunner.shutdown(message)
-            sys.exit(0)
-        except StopPropagation as e:
-            raise StopPropagation from e
-        except Exception as exception:
-            logs.info(f"[process_error]: {type(exception)}: {exception}")
+            raise
 
     @staticmethod
-    async def load_success_exec():
-        if cors := [
-            load(**inject(None, load))  # noqa
-            for load in hook_functions["load_plugins_finished"]
-        ]:  # noqa
-            try:
-                await asyncio.gather(*cors)
-            except Exception as exception:
-                logs.info(f"[load_success_exec]: {type(exception)}: {exception}")
+    async def load_success_exec() -> List[HookFailure]:
+        return await HookRunner._run_hooks(
+            "load_success", hook_functions["load_plugins_finished"]
+        )
 
     @staticmethod
-    async def reload_pre_exec():
-        if cors := [
-            reload(**inject(None, reload))  # noqa
-            for reload in hook_functions["reload_pre"]
-        ]:  # noqa
-            try:
-                await asyncio.gather(*cors)
-            except Exception as exception:
-                logs.info(f"[reload_pre_exec]: {type(exception)}: {exception}")
+    async def reload_pre_exec() -> List[HookFailure]:
+        return await HookRunner._run_hooks("reload_pre", hook_functions["reload_pre"])

@@ -145,7 +145,7 @@ def listener(**args) -> CommandHandlerDecorator:
                 try:
                     if ignore_groups_manager.check_id(context.chat_id):
                         return
-                except BaseException:
+                except Exception:
                     pass
                 try:
                     arguments = context.pattern_match.group(2)
@@ -162,7 +162,7 @@ def listener(**args) -> CommandHandlerDecorator:
                         return
                     context.parameter = parameter
                     context.arguments = arguments
-                except BaseException:
+                except Exception:
                     context.parameter = None
                     context.arguments = None
                 # solve same process
@@ -205,15 +205,13 @@ def listener(**args) -> CommandHandlerDecorator:
             except (SystemExit, CancelledError):
                 await HookRunner.shutdown(context)
                 web.stop()
-            except BaseException as exc:
+            except Exception as exc:
                 exc_info = sys.exc_info()[1]
                 exc_format = format_exc()
-                with contextlib.suppress(BaseException):
+                with contextlib.suppress(Exception):
                     exc_text = format_exc_text(exc)
                     text = f"{lang('run_error')}\n\n{exc_text}"
                     await context.edit(text, no_reply=True)  # noqa
-                if not diagnostics:
-                    return
                 report = (
                     f"# Generated: {strftime('%H:%M %d/%m/%Y', gmtime())}. \n"
                     f"# ChatID: {str(context.chat_id)}. \n"
@@ -226,6 +224,8 @@ def listener(**args) -> CommandHandlerDecorator:
                 )
 
                 logs.error(report)
+                if not diagnostics:
+                    return
                 await HookRunner.process_error_exec(
                     context, command, exc_info, exc_format
                 )
