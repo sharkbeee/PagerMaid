@@ -23,6 +23,14 @@ Pagermaid 是一个用在 Telegram 的实用工具。
 
 它通过响应账号通过其他客户端发出的命令来自动执行一系列任务。
 
+## 维护说明与上游来源
+
+本仓库是 [TeamPGM/PagerMaid-Modify](https://github.com/TeamPGM/PagerMaid-Modify)
+的独立维护分支，由 [sharkbeee](https://github.com/sharkbeee) 继续维护。
+
+本仓库包含独立维护的修改，不由原项目维护者提供支持。原项目作者与贡献者的
+著作权和贡献归属保持不变。
+
 更新频道：https://t.me/PagerMaid_Modify
 
 ## 安装
