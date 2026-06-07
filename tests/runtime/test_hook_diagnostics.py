@@ -104,3 +104,82 @@ async def test_command_errors_are_logged_when_diagnostics_are_disabled(monkeypat
     assert len(log_messages) == 1
     assert "RuntimeError: command failed" in log_messages[0]
     assert process_error_calls == []
+
+
+@pytest.mark.anyio
+async def test_command_cancellation_is_reraised(monkeypatch):
+    shutdown_requests = []
+
+    async def cancelled_command():
+        raise asyncio.CancelledError
+
+    monkeypatch.setattr(
+        listener_module.ignore_groups_manager, "check_id", lambda _: False
+    )
+    monkeypatch.setattr(listener_module.bot, "add_event_handler", lambda *_: None)
+    monkeypatch.setattr(
+        listener_module.lifecycle,
+        "request_shutdown",
+        lambda *args: shutdown_requests.append(args),
+    )
+
+    command = listener_module.listener(ignore_edited=True)(cancelled_command)
+    context = SimpleNamespace(
+        is_group=False,
+        is_private=True,
+        via_bot_id=None,
+        forward=None,
+        chat_id=1,
+        id=2,
+        sender_id=3,
+        text="cancel command",
+    )
+
+    with pytest.raises(asyncio.CancelledError):
+        await command.get_handler()(context)
+
+    assert shutdown_requests == []
+
+
+@pytest.mark.anyio
+async def test_process_error_exit_requests_coordinated_shutdown(monkeypatch):
+    shutdown_requests = []
+
+    async def failing_command():
+        raise RuntimeError("command failed")
+
+    async def process_error(*args, **kwargs):
+        raise SystemExit
+
+    monkeypatch.setattr(
+        listener_module.ignore_groups_manager, "check_id", lambda _: False
+    )
+    monkeypatch.setattr(listener_module.bot, "add_event_handler", lambda *_: None)
+    monkeypatch.setattr(listener_module.logs, "error", lambda _: None)
+    monkeypatch.setattr(listener_module.HookRunner, "process_error_exec", process_error)
+    monkeypatch.setattr(
+        listener_module.lifecycle,
+        "request_shutdown",
+        lambda *args: shutdown_requests.append(args),
+    )
+
+    command = listener_module.listener(ignore_edited=True)(failing_command)
+    context = SimpleNamespace(
+        is_group=False,
+        is_private=True,
+        via_bot_id=None,
+        forward=None,
+        chat_id=1,
+        id=2,
+        sender_id=3,
+        text="failed command",
+    )
+
+    async def edit(*args, **kwargs):
+        return None
+
+    context.edit = edit
+
+    await command.get_handler()(context)
+
+    assert shutdown_requests == [("process_error_exit", context)]

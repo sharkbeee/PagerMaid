@@ -24,6 +24,7 @@ from pagermaid.enums import Message
 from pagermaid.enums.command import CommandHandler, CommandHandlerDecorator
 from pagermaid.group_manager import Permission
 from pagermaid.hook import HookRunner
+from pagermaid.runtime import lifecycle
 from pagermaid.services import bot
 from pagermaid.static import all_permissions, help_messages, read_context
 from pagermaid.utils import (
@@ -37,7 +38,6 @@ from pagermaid.utils.listener import (
 from pagermaid.utils.listener import (
     get_permission_name,
 )
-from pagermaid.web import web
 from pyromod.utils.handler_priority import HandlerList
 
 _lock = asyncio.Lock()
@@ -202,9 +202,10 @@ def listener(**args) -> CommandHandlerDecorator:
                 )
             except MessageIdInvalidError:
                 logs.warning("Please Don't Delete Commands While it's Processing..")
-            except (SystemExit, CancelledError):
-                await HookRunner.shutdown(context)
-                web.stop()
+            except SystemExit:
+                lifecycle.request_shutdown("command_exit", context)
+            except CancelledError:
+                raise
             except Exception as exc:
                 exc_info = sys.exc_info()[1]
                 exc_format = format_exc()
@@ -226,9 +227,12 @@ def listener(**args) -> CommandHandlerDecorator:
                 logs.error(report)
                 if not diagnostics:
                     return
-                await HookRunner.process_error_exec(
-                    context, command, exc_info, exc_format
-                )
+                try:
+                    await HookRunner.process_error_exec(
+                        context, command, exc_info, exc_format
+                    )
+                except SystemExit:
+                    lifecycle.request_shutdown("process_error_exit", context)
             finally:
                 if (context.chat_id, context.id) in read_context:
                     del read_context[(context.chat_id, context.id)]

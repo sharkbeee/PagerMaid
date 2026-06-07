@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
 from pagermaid.common.update import update
+from pagermaid.runtime import lifecycle
 from pagermaid.web.api.utils import authentication
 
 route = APIRouter()
@@ -17,7 +18,5 @@ async def bot_update():
     "/bot_restart", response_class=JSONResponse, dependencies=[authentication()]
 )
 async def bot_restart():
-    from pagermaid.web import web
-
-    web.stop()
+    lifecycle.request_shutdown("web_restart")
     return {}

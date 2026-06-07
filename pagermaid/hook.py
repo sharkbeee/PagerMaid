@@ -155,7 +155,7 @@ class HookRunner:
         return await HookRunner._run_hooks("startup", hook_functions["startup"])
 
     @staticmethod
-    async def shutdown(message: "Message") -> List[HookFailure]:
+    async def shutdown(message: Optional["Message"] = None) -> List[HookFailure]:
         return await HookRunner._run_hooks(
             "shutdown", hook_functions["shutdown"], message=message
         )
@@ -188,18 +188,14 @@ class HookRunner:
     async def process_error_exec(
         message: "Message", command, exc_info: BaseException, exc_format: str
     ) -> List[HookFailure]:
-        try:
-            return await HookRunner._run_hooks(
-                "process_error",
-                hook_functions["process_error"],
-                message=message,
-                command=command,
-                exc_info=exc_info,
-                exc_format=exc_format,
-            )
-        except SystemExit:
-            await HookRunner.shutdown(message)
-            raise
+        return await HookRunner._run_hooks(
+            "process_error",
+            hook_functions["process_error"],
+            message=message,
+            command=command,
+            exc_info=exc_info,
+            exc_format=exc_format,
+        )
 
     @staticmethod
     async def load_success_exec() -> List[HookFailure]:

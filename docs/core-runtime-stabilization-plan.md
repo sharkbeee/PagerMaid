@@ -218,7 +218,7 @@ Exit criteria:
 
 ### Milestone 5. Centralized Process Lifecycle
 
-Status: `planned`
+Status: `done`
 
 Deliverables:
 

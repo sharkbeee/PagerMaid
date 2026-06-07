@@ -1,7 +1,6 @@
 """System related utilities for PagerMaid to integrate into the system."""
 
 import html
-import sys
 from getpass import getuser
 from os.path import exists, sep
 from platform import node
@@ -12,6 +11,7 @@ from pagermaid.common.system import paste_pb, process_exit, run_eval
 from pagermaid.config import Config
 from pagermaid.hook import Hook
 from pagermaid.listener import listener
+from pagermaid.runtime import lifecycle
 from pagermaid.utils import execute, lang
 from pagermaid.utils.bot_utils import attach_log, upload_attachment
 
@@ -73,7 +73,7 @@ async def restart(message: "Message"):
     """To re-execute PagerMaid."""
     if not message.text[0].isalpha():
         await message.edit(lang("restart_log"))
-        sys.exit(0)
+        lifecycle.request_shutdown("telegram_restart", message)
 
 
 @Hook.on_shutdown()

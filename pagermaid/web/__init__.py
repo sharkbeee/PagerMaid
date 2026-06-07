@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 
 from fastapi import FastAPI
 
@@ -59,6 +60,22 @@ class Web:
             self.web_server_task.cancel()
         if self.bot_main_task:
             self.bot_main_task.cancel()
+
+    async def shutdown(self):
+        server_task = self.web_server_task
+        if server_task:
+            server_task.cancel()
+        try:
+            if self.web_server:
+                await self.web_server.shutdown()
+        finally:
+            try:
+                if server_task:
+                    with contextlib.suppress(asyncio.CancelledError):
+                        await server_task
+            finally:
+                self.web_server_task = None
+                self.web_server = None
 
 
 web = Web()
