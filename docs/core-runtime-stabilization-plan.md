@@ -12,12 +12,21 @@ current singleton-based runtime architecture.
 
 ## Status
 
-Status: `in_progress`
+Status: `done`
 
 Baseline verification:
 
 - `.venv/bin/pytest -q`
 - 21 tests passed before stabilization work began.
+
+Final verification:
+
+- `.venv/bin/pytest -q tests/runtime`
+- `.venv/bin/pytest -q`
+- `.venv/bin/python -m compileall -q pagermaid tests`
+- `.venv/bin/python -c 'import pagermaid.__main__; print("import-safe")'`
+- `git diff --check`
+- 20 runtime tests and 45 total tests passed at closure.
 
 ## Current Decisions
 
@@ -238,7 +247,7 @@ Exit criteria:
 
 ### Milestone 6. Closure
 
-Status: `planned`
+Status: `done`
 
 Deliverables:
 
@@ -251,18 +260,39 @@ Exit criteria:
 - The stabilization acceptance criteria pass.
 - Remaining architecture work has a clear boundary.
 
+## Final Outcomes
+
+- Startup and reload operations return structured success and failure
+  information without making individual module or plugin failures fatal.
+- Hook failures are isolated, attributed to the failing callable, and logged
+  with tracebacks.
+- Command failures are logged locally even when optional diagnostics hooks are
+  disabled.
+- Concurrent reload requests are rejected as busy before live runtime state is
+  mutated.
+- Telegram and web reload callers no longer report unconditional success after
+  busy or partial-failure outcomes.
+- Process startup has one cleanup boundary and `pagermaid.__main__` no longer
+  starts the process when imported.
+- Signals, Telegram restart, web restart, and command exits request shutdown
+  through one lifecycle coordinator.
+- Shutdown runs at most once in deterministic order: web, scheduler, shutdown
+  hooks, then bot disconnect.
+- Cancellation propagates instead of being treated as an ordinary restart or
+  swallowed by broad exception handling.
+
 ## Acceptance Criteria
 
-- Existing operator startup behavior remains compatible.
-- Individual built-in module or external plugin failures do not terminate the
-  process.
-- Reload requests cannot run concurrently.
-- No caller reports reload success after a partial failure.
-- Shutdown hooks run once during normal process shutdown.
-- Startup failures clean up already-started components.
-- Cancellation, `KeyboardInterrupt`, and `SystemExit` are not swallowed
+- `done`: Existing operator startup behavior remains compatible.
+- `done`: Individual built-in module or external plugin failures do not
+  terminate the process.
+- `done`: Reload requests cannot run concurrently.
+- `done`: No caller reports reload success after a partial failure.
+- `done`: Shutdown hooks run once during normal process shutdown.
+- `done`: Startup failures clean up already-started components.
+- `done`: Cancellation, `KeyboardInterrupt`, and `SystemExit` are not swallowed
   accidentally.
-- Existing and new tests pass after every implementation commit.
+- `done`: Existing and new tests passed after every implementation commit.
 
 ## Residual Risks
 
@@ -274,3 +304,7 @@ Exit criteria:
 
 These risks require the later registry-based runtime architecture rather than
 incremental stabilization changes.
+
+The focused stabilization track is complete. Further runtime changes should be
+handled as normal maintenance or under the later Formalize the Runtime
+Architecture roadmap item.

@@ -20,11 +20,11 @@ This document is the maintainer-facing roadmap for PagerMaid. It is a living doc
 
 ## Current Focus
 
-- Runtime reliability and reload safety.
 - Dependency and environment cleanup.
 - Clearer plugin lifecycle and plugin API boundaries.
 - Better maintainer and contributor documentation.
 - Recently completed: web/admin refactor and hardening.
+- Recently completed: focused core runtime stabilization.
 
 Remaining web/admin work should now be handled as normal maintenance or mid-term follow-up,
 not as a continuation of the completed web refactor track.
@@ -56,15 +56,26 @@ Deferred web/admin follow-up:
 - Continue separating web routes from runtime/process control where it materially reduces risk.
 - Improve web/admin UX and operator feedback as part of broader admin maintenance.
 
-### 2. In Progress: Stabilize the Core Runtime
+### 2. Completed: Stabilize the Core Runtime
 
 Detailed scope and status are tracked in
 [`docs/core-runtime-stabilization-plan.md`](docs/core-runtime-stabilization-plan.md).
 
-- Audit startup, shutdown, and reload behavior.
-- Reduce reliance on fragile global mutable state.
-- Improve error reporting around plugin loading and command execution.
-- Add smoke tests for boot, plugin load, reload, and shutdown.
+Completed closure scope:
+
+- Audited and characterized startup, shutdown, load, reload, hooks, and command
+  diagnostics.
+- Added structured module, plugin, hook, startup, and reload outcomes.
+- Prevented concurrent reload operations and false reload-success responses.
+- Centralized shutdown requests and deterministic cleanup.
+- Added smoke tests for boot, plugin load, reload, shutdown, and failure paths.
+
+Deferred runtime architecture follow-up:
+
+- Replace remaining singleton services and global mutable registries.
+- Reduce remaining import-time side effects.
+- Introduce registry-based module, plugin, hook, and command registration.
+- Design transactional reload staging and rollback.
 
 ### 3. Make the Project Easier to Maintain
 
